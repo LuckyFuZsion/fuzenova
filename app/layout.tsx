@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: 'FuzeNova Games | Elemental worlds, forged in your browser', template: '%s | FuzeNova Games' },
   description: 'Free browser games from FuzeNova Games, a one-person UK indie studio. No download, no install, saves that follow you.',
+  manifest: '/site.webmanifest',
   openGraph: { type: 'website', siteName: 'FuzeNova Games', locale: 'en_GB' },
   twitter: { card: 'summary_large_image' },
 }

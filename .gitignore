@@ -22,3 +22,5 @@ games/cinder-automata/release/
 games/cinder-automata/dist/
 games/cinder-automata/.claude/
 games/cinder-automata/.cursor/
+
+.vercel
