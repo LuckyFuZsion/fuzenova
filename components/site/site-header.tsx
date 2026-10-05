@@ -50,7 +50,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <a href="/play/crystalbound-saga/index.html" className="btn btn-gold hidden lg:inline-flex">
+        <a href="/go/crystalbound-saga" className="btn btn-gold hidden lg:inline-flex">
           Play now <ArrowRight className="size-4" aria-hidden="true" />
         </a>
         <button
@@ -86,7 +86,7 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <a href="/play/crystalbound-saga/index.html" className="btn btn-gold mt-4">
+            <a href="/go/crystalbound-saga" className="btn btn-gold mt-4">
               Play now <ArrowRight className="size-4" aria-hidden="true" />
             </a>
           </motion.nav>
