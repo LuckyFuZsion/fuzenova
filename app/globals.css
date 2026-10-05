@@ -1,0 +1,315 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* The games are standalone builds, not part of this site's markup. */
+@source not '../games';
+@source not '../public/play';
+
+:root {
+  --void: #05081a;
+  --deep: #0b1030;
+  --panel: rgba(18, 24, 64, 0.7);
+  --ember: #ff7a2a;
+  --loam: #7ad12a;
+  --tide: #2ec8ff;
+  --storm: #a45cff;
+  --dawn: #ffe27a;
+  --text: #f3ecff;
+  --muted: #a9a3c9;
+  --line: rgba(255, 255, 255, 0.08);
+  --background: var(--void);
+  --foreground: var(--text);
+  --radius: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-void: var(--void);
+  --color-deep: var(--deep);
+  --color-panel: var(--panel);
+  --color-ember: var(--ember);
+  --color-loam: var(--loam);
+  --color-tide: var(--tide);
+  --color-storm: var(--storm);
+  --color-dawn: var(--dawn);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cinzel), Georgia, serif;
+  --spacing-18: 4.5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--dawn);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--dawn);
+  color: var(--void);
+}
+
+@layer components {
+  .heading {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 46px;
+    padding: 0.7rem 1.35rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-weight: 800;
+    font-size: 15px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn-gold {
+    background: var(--dawn);
+    color: #141126;
+    box-shadow: 0 0 24px rgba(255, 226, 122, 0.2);
+  }
+  .btn-gold:hover {
+    box-shadow: 0 0 36px rgba(255, 226, 122, 0.4);
+  }
+  .btn-outline {
+    border-color: rgba(255, 255, 255, 0.22);
+    color: var(--text);
+  }
+  .btn-outline:hover {
+    border-color: var(--dawn);
+    color: var(--dawn);
+  }
+
+  .glass-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .glow-card {
+    --glow: var(--dawn);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .glow-card:hover,
+  .glow-card:focus-within {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--glow) 45%, transparent);
+    box-shadow: 0 20px 60px -10px color-mix(in srgb, var(--glow) 35%, transparent);
+  }
+
+  .element-divider {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--ember) 20%, var(--loam) 40%, var(--tide) 60%, var(--storm) 80%, transparent);
+    opacity: 0.6;
+  }
+
+  .footer-link {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .footer-link:hover {
+    color: var(--dawn);
+  }
+
+  .field {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(5, 8, 26, 0.6);
+    color: var(--text);
+    padding: 0.7rem 1rem;
+  }
+  .field:focus {
+    border-color: var(--dawn);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 226, 122, 0.2);
+  }
+  .field[aria-invalid='true'] {
+    border-color: var(--ember);
+  }
+  select.field option {
+    background: var(--deep);
+  }
+
+  .lightbox-btn {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--deep);
+    color: var(--text);
+  }
+  .lightbox-btn:hover {
+    color: var(--dawn);
+    border-color: var(--dawn);
+  }
+
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nova-banner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+      radial-gradient(40% 120% at 0% 50%, rgba(255, 122, 42, 0.22), transparent),
+      radial-gradient(40% 120% at 35% 100%, rgba(122, 209, 42, 0.14), transparent),
+      radial-gradient(40% 120% at 70% 0%, rgba(46, 200, 255, 0.16), transparent),
+      radial-gradient(40% 120% at 100% 50%, rgba(164, 92, 255, 0.24), transparent),
+      var(--deep);
+  }
+
+  .page-glow {
+    position: absolute;
+    inset: -40% 0 auto;
+    height: 140%;
+    background:
+      radial-gradient(30% 40% at 50% 50%, rgba(255, 226, 122, 0.12), transparent 70%),
+      radial-gradient(25% 35% at 30% 40%, rgba(164, 92, 255, 0.12), transparent 70%),
+      radial-gradient(25% 35% at 70% 40%, rgba(46, 200, 255, 0.1), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Hero nova */
+  .nova-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .starfield {
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 70% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 40% 80%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 85% 65%, #fff, transparent),
+      radial-gradient(1px 1px at 10% 70%, #fff, transparent),
+      radial-gradient(1px 1px at 55% 45%, #fff, transparent);
+    background-size: 340px 340px;
+  }
+  .bloom {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 42vmax;
+    height: 42vmax;
+    margin: -21vmax 0 0 -21vmax;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.32;
+    animation: converge 16s ease-in-out infinite alternate;
+  }
+  .bloom-ember { background: var(--ember); --x: -42%; --y: -30%; }
+  .bloom-loam { background: var(--loam); --x: 42%; --y: -32%; animation-delay: -4s; opacity: 0.22; }
+  .bloom-tide { background: var(--tide); --x: -38%; --y: 34%; animation-delay: -8s; }
+  .bloom-storm { background: var(--storm); --x: 40%; --y: 32%; animation-delay: -12s; }
+  .bloom { transform: translate(var(--x), var(--y)); }
+  .core-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30vmax;
+    height: 30vmax;
+    margin: -15vmax 0 0 -15vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 226, 122, 0.35), rgba(255, 226, 122, 0.08) 45%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  /* Cinder page textures */
+  .blueprint {
+    background-image:
+      linear-gradient(rgba(255, 122, 42, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 122, 42, 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .ash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image:
+      radial-gradient(1.5px 1.5px at 10% 20%, #9a8f88, transparent),
+      radial-gradient(1px 1px at 30% 60%, #ff7a2a, transparent),
+      radial-gradient(1.5px 1.5px at 60% 30%, #9a8f88, transparent),
+      radial-gradient(1px 1px at 80% 80%, #ff4a1a, transparent),
+      radial-gradient(1px 1px at 50% 90%, #9a8f88, transparent);
+    background-size: 300px 300px;
+    animation: ash 30s linear infinite;
+  }
+}
+
+@keyframes converge {
+  to {
+    transform: translate(calc(var(--x) * 0.45), calc(var(--y) * 0.45)) scale(0.85);
+    opacity: 0.42;
+  }
+}
+@keyframes pulse {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.85;
+  }
+}
+@keyframes ash {
+  to {
+    background-position: 60px -300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

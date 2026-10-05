@@ -1,0 +1,2115 @@
+{
+  "belt-straight": {
+    "file": "sprites/belt-straight.png",
+    "w": 368,
+    "h": 347,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "belt-curve": {
+    "file": "sprites/belt-curve.png",
+    "w": 334,
+    "h": 337,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "splitter": {
+    "file": "sprites/splitter.png",
+    "w": 376,
+    "h": 415,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "underground": {
+    "file": "sprites/underground.png",
+    "w": 377,
+    "h": 337,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "inserter": {
+    "file": "sprites/inserter.png",
+    "w": 429,
+    "h": 226,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "chest-wood": {
+    "file": "sprites/chest-wood.png",
+    "w": 339,
+    "h": 332,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "chest-steel": {
+    "file": "sprites/chest-steel.png",
+    "w": 339,
+    "h": 386,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "pole": {
+    "file": "sprites/pole.png",
+    "w": 360,
+    "h": 199,
+    "sheet": "sheet-01-logistics.jpg"
+  },
+  "drill-2x2": {
+    "file": "sprites/drill-2x2.png",
+    "w": 418,
+    "h": 316,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "drill-3x3": {
+    "file": "sprites/drill-3x3.png",
+    "w": 476,
+    "h": 396,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "furnace-stone": {
+    "file": "sprites/furnace-stone.png",
+    "w": 313,
+    "h": 359,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "furnace-steel": {
+    "file": "sprites/furnace-steel.png",
+    "w": 332,
+    "h": 367,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "furnace-steel-b": {
+    "file": "sprites/furnace-steel-b.png",
+    "w": 371,
+    "h": 381,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "boiler": {
+    "file": "sprites/boiler.png",
+    "w": 512,
+    "h": 397,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "steam-engine": {
+    "file": "sprites/steam-engine.png",
+    "w": 512,
+    "h": 228,
+    "sheet": "sheet-02-extraction.jpg"
+  },
+  "inserter-base": {
+    "file": "sprites/inserter-base.png",
+    "w": 357,
+    "h": 371,
+    "sheet": "sheet-03-inserter.jpg"
+  },
+  "inserter-arm": {
+    "file": "sprites/inserter-arm.png",
+    "w": 512,
+    "h": 139,
+    "sheet": "sheet-03-inserter.jpg"
+  },
+  "inserter-arm-b": {
+    "file": "sprites/inserter-arm-b.png",
+    "w": 512,
+    "h": 160,
+    "sheet": "sheet-03-inserter.jpg"
+  },
+  "inserter-arm-open": {
+    "file": "sprites/inserter-arm-open.png",
+    "w": 512,
+    "h": 224,
+    "sheet": "sheet-03-inserter.jpg"
+  },
+  "ore-iron": {
+    "file": "sprites/ore-iron.png",
+    "w": 356,
+    "h": 290,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "ore-copper": {
+    "file": "sprites/ore-copper.png",
+    "w": 357,
+    "h": 309,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "coal": {
+    "file": "sprites/coal.png",
+    "w": 374,
+    "h": 302,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "stone": {
+    "file": "sprites/stone.png",
+    "w": 349,
+    "h": 292,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "plate-iron": {
+    "file": "sprites/plate-iron.png",
+    "w": 404,
+    "h": 287,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "plate-copper": {
+    "file": "sprites/plate-copper.png",
+    "w": 407,
+    "h": 286,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "plate-steel": {
+    "file": "sprites/plate-steel.png",
+    "w": 389,
+    "h": 242,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "brick": {
+    "file": "sprites/brick.png",
+    "w": 394,
+    "h": 282,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "sand": {
+    "file": "sprites/sand.png",
+    "w": 412,
+    "h": 260,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "glass": {
+    "file": "sprites/glass.png",
+    "w": 348,
+    "h": 292,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "sulfur": {
+    "file": "sprites/sulfur.png",
+    "w": 302,
+    "h": 303,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "scrap": {
+    "file": "sprites/scrap.png",
+    "w": 394,
+    "h": 324,
+    "sheet": "sheet-04-raw-and-plates.jpg"
+  },
+  "gear": {
+    "file": "sprites/gear.png",
+    "w": 357,
+    "h": 314,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "cable-copper": {
+    "file": "sprites/cable-copper.png",
+    "w": 334,
+    "h": 307,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "rod-iron": {
+    "file": "sprites/rod-iron.png",
+    "w": 363,
+    "h": 312,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "pipe-item": {
+    "file": "sprites/pipe-item.png",
+    "w": 374,
+    "h": 234,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "circuit": {
+    "file": "sprites/circuit.png",
+    "w": 386,
+    "h": 253,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "circuit-advanced": {
+    "file": "sprites/circuit-advanced.png",
+    "w": 376,
+    "h": 253,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "plastic": {
+    "file": "sprites/plastic.png",
+    "w": 370,
+    "h": 285,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "battery": {
+    "file": "sprites/battery.png",
+    "w": 360,
+    "h": 193,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "motor": {
+    "file": "sprites/motor.png",
+    "w": 309,
+    "h": 332,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "engine": {
+    "file": "sprites/engine.png",
+    "w": 434,
+    "h": 288,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "frame-basic": {
+    "file": "sprites/frame-basic.png",
+    "w": 379,
+    "h": 313,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "spring-coil": {
+    "file": "sprites/spring-coil.png",
+    "w": 381,
+    "h": 240,
+    "sheet": "sheet-05-intermediates-1.jpg"
+  },
+  "sci-red": {
+    "file": "sprites/sci-red.png",
+    "w": 359,
+    "h": 321,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-green": {
+    "file": "sprites/sci-green.png",
+    "w": 359,
+    "h": 321,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-blue": {
+    "file": "sprites/sci-blue.png",
+    "w": 359,
+    "h": 321,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-pink": {
+    "file": "sprites/sci-pink.png",
+    "w": 358,
+    "h": 321,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-purple": {
+    "file": "sprites/sci-purple.png",
+    "w": 359,
+    "h": 324,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-yellow": {
+    "file": "sprites/sci-yellow.png",
+    "w": 359,
+    "h": 324,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-white": {
+    "file": "sprites/sci-white.png",
+    "w": 358,
+    "h": 324,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-white-b": {
+    "file": "sprites/sci-white-b.png",
+    "w": 359,
+    "h": 324,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-military": {
+    "file": "sprites/sci-military.png",
+    "w": 309,
+    "h": 323,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-space": {
+    "file": "sprites/sci-space.png",
+    "w": 355,
+    "h": 327,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-disc": {
+    "file": "sprites/sci-disc.png",
+    "w": 352,
+    "h": 328,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "sci-data": {
+    "file": "sprites/sci-data.png",
+    "w": 381,
+    "h": 296,
+    "sheet": "sheet-07-science.jpg"
+  },
+  "ammo-basic": {
+    "file": "sprites/ammo-basic.png",
+    "w": 204,
+    "h": 198,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-piercing": {
+    "file": "sprites/ammo-piercing.png",
+    "w": 226,
+    "h": 201,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-shell": {
+    "file": "sprites/ammo-shell.png",
+    "w": 283,
+    "h": 146,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-explosive-shell": {
+    "file": "sprites/ammo-explosive-shell.png",
+    "w": 282,
+    "h": 142,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "grenade": {
+    "file": "sprites/grenade.png",
+    "w": 185,
+    "h": 235,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "mine-item": {
+    "file": "sprites/mine-item.png",
+    "w": 263,
+    "h": 207,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-flame": {
+    "file": "sprites/ammo-flame.png",
+    "w": 263,
+    "h": 190,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-rocket": {
+    "file": "sprites/ammo-rocket.png",
+    "w": 295,
+    "h": 138,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "ammo-laser-battery": {
+    "file": "sprites/ammo-laser-battery.png",
+    "w": 263,
+    "h": 156,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "capsule-repair": {
+    "file": "sprites/capsule-repair.png",
+    "w": 271,
+    "h": 222,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "capsule-heal": {
+    "file": "sprites/capsule-heal.png",
+    "w": 266,
+    "h": 148,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "capsule-shield": {
+    "file": "sprites/capsule-shield.png",
+    "w": 258,
+    "h": 257,
+    "sheet": "sheet-08-ammo-weapons.jpg"
+  },
+  "belt-fast-straight": {
+    "file": "sprites/belt-fast-straight.png",
+    "w": 259,
+    "h": 244,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "belt-fast-curve": {
+    "file": "sprites/belt-fast-curve.png",
+    "w": 235,
+    "h": 238,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "splitter-fast": {
+    "file": "sprites/splitter-fast.png",
+    "w": 264,
+    "h": 292,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "underground-fast": {
+    "file": "sprites/underground-fast.png",
+    "w": 265,
+    "h": 238,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "belt-express-straight": {
+    "file": "sprites/belt-express-straight.png",
+    "w": 260,
+    "h": 257,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "belt-express-curve": {
+    "file": "sprites/belt-express-curve.png",
+    "w": 240,
+    "h": 255,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "splitter-express": {
+    "file": "sprites/splitter-express.png",
+    "w": 265,
+    "h": 295,
+    "sheet": "sheet-12-belts-tier2.jpg"
+  },
+  "inserter-long-base": {
+    "file": "sprites/inserter-long-base.png",
+    "w": 323,
+    "h": 325,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-long-arm": {
+    "file": "sprites/inserter-long-arm.png",
+    "w": 512,
+    "h": 150,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-fast-base": {
+    "file": "sprites/inserter-fast-base.png",
+    "w": 323,
+    "h": 325,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-fast-arm": {
+    "file": "sprites/inserter-fast-arm.png",
+    "w": 510,
+    "h": 175,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-filter-arm": {
+    "file": "sprites/inserter-filter-arm.png",
+    "w": 480,
+    "h": 174,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-stack-base": {
+    "file": "sprites/inserter-stack-base.png",
+    "w": 323,
+    "h": 314,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-stack-arm": {
+    "file": "sprites/inserter-stack-arm.png",
+    "w": 512,
+    "h": 198,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-stack-base-b": {
+    "file": "sprites/inserter-stack-base-b.png",
+    "w": 325,
+    "h": 315,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "inserter-stack-arm-open": {
+    "file": "sprites/inserter-stack-arm-open.png",
+    "w": 512,
+    "h": 208,
+    "sheet": "sheet-13-inserter-tiers.jpg"
+  },
+  "pole-medium": {
+    "file": "sprites/pole-medium.png",
+    "w": 383,
+    "h": 424,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "pole-big": {
+    "file": "sprites/pole-big.png",
+    "w": 399,
+    "h": 512,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "substation": {
+    "file": "sprites/substation.png",
+    "w": 412,
+    "h": 431,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "lamp-off": {
+    "file": "sprites/lamp-off.png",
+    "w": 308,
+    "h": 354,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "lamp-on": {
+    "file": "sprites/lamp-on.png",
+    "w": 309,
+    "h": 510,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "switch-power": {
+    "file": "sprites/switch-power.png",
+    "w": 333,
+    "h": 346,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "accumulator": {
+    "file": "sprites/accumulator.png",
+    "w": 373,
+    "h": 455,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "transformer": {
+    "file": "sprites/transformer.png",
+    "w": 445,
+    "h": 484,
+    "sheet": "sheet-14-power-distribution.jpg"
+  },
+  "offshore-pump": {
+    "file": "sprites/offshore-pump.png",
+    "w": 392,
+    "h": 299,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "solar-panel": {
+    "file": "sprites/solar-panel.png",
+    "w": 428,
+    "h": 450,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "steam-turbine": {
+    "file": "sprites/steam-turbine.png",
+    "w": 264,
+    "h": 512,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "nuclear-reactor": {
+    "file": "sprites/nuclear-reactor.png",
+    "w": 483,
+    "h": 512,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "heat-exchanger": {
+    "file": "sprites/heat-exchanger.png",
+    "w": 476,
+    "h": 317,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "heat-exchanger-b": {
+    "file": "sprites/heat-exchanger-b.png",
+    "w": 489,
+    "h": 352,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "heat-pipe": {
+    "file": "sprites/heat-pipe.png",
+    "w": 285,
+    "h": 307,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "generator-diesel": {
+    "file": "sprites/generator-diesel.png",
+    "w": 433,
+    "h": 442,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "wind-turbine": {
+    "file": "sprites/wind-turbine.png",
+    "w": 477,
+    "h": 476,
+    "sheet": "sheet-15-power-generation.jpg"
+  },
+  "assembler-1": {
+    "file": "sprites/assembler-1.png",
+    "w": 450,
+    "h": 410,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "assembler-2": {
+    "file": "sprites/assembler-2.png",
+    "w": 403,
+    "h": 426,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "assembler-3": {
+    "file": "sprites/assembler-3.png",
+    "w": 401,
+    "h": 389,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "lab": {
+    "file": "sprites/lab.png",
+    "w": 403,
+    "h": 397,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "lab-2": {
+    "file": "sprites/lab-2.png",
+    "w": 400,
+    "h": 480,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "chem-plant": {
+    "file": "sprites/chem-plant.png",
+    "w": 412,
+    "h": 426,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "refinery": {
+    "file": "sprites/refinery.png",
+    "w": 441,
+    "h": 512,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "centrifuge": {
+    "file": "sprites/centrifuge.png",
+    "w": 380,
+    "h": 419,
+    "sheet": "sheet-17-crafters.jpg"
+  },
+  "furnace-electric": {
+    "file": "sprites/furnace-electric.png",
+    "w": 433,
+    "h": 294,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "drill-burner": {
+    "file": "sprites/drill-burner.png",
+    "w": 512,
+    "h": 265,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "drill-electric": {
+    "file": "sprites/drill-electric.png",
+    "w": 512,
+    "h": 229,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "drill-big": {
+    "file": "sprites/drill-big.png",
+    "w": 512,
+    "h": 340,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "pumpjack": {
+    "file": "sprites/pumpjack.png",
+    "w": 512,
+    "h": 368,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "furnace-foundry": {
+    "file": "sprites/furnace-foundry.png",
+    "w": 512,
+    "h": 445,
+    "sheet": "sheet-18-furnaces-drills.jpg"
+  },
+  "turret-gun-base": {
+    "file": "sprites/turret-gun-base.png",
+    "w": 306,
+    "h": 305,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-gun-barrel": {
+    "file": "sprites/turret-gun-barrel.png",
+    "w": 447,
+    "h": 215,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-flame-base": {
+    "file": "sprites/turret-flame-base.png",
+    "w": 306,
+    "h": 304,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-flame-nozzle": {
+    "file": "sprites/turret-flame-nozzle.png",
+    "w": 422,
+    "h": 200,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-laser-base": {
+    "file": "sprites/turret-laser-base.png",
+    "w": 308,
+    "h": 304,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-laser-lens": {
+    "file": "sprites/turret-laser-lens.png",
+    "w": 510,
+    "h": 179,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-rocket-base": {
+    "file": "sprites/turret-rocket-base.png",
+    "w": 426,
+    "h": 404,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-rocket-launcher": {
+    "file": "sprites/turret-rocket-launcher.png",
+    "w": 488,
+    "h": 253,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-cannon-mount": {
+    "file": "sprites/turret-cannon-mount.png",
+    "w": 282,
+    "h": 281,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-artillery-base": {
+    "file": "sprites/turret-artillery-base.png",
+    "w": 402,
+    "h": 391,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "turret-artillery-barrel": {
+    "file": "sprites/turret-artillery-barrel.png",
+    "w": 512,
+    "h": 149,
+    "sheet": "sheet-23-turrets.jpg"
+  },
+  "wall-straight": {
+    "file": "sprites/wall-straight.png",
+    "w": 257,
+    "h": 160,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "wall-corner": {
+    "file": "sprites/wall-corner.png",
+    "w": 228,
+    "h": 234,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "wall-t": {
+    "file": "sprites/wall-t.png",
+    "w": 274,
+    "h": 223,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "wall-cross": {
+    "file": "sprites/wall-cross.png",
+    "w": 278,
+    "h": 275,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "wall-end": {
+    "file": "sprites/wall-end.png",
+    "w": 170,
+    "h": 160,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "gate-closed": {
+    "file": "sprites/gate-closed.png",
+    "w": 255,
+    "h": 198,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "gate-open": {
+    "file": "sprites/gate-open.png",
+    "w": 102,
+    "h": 198,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "gate-open-b": {
+    "file": "sprites/gate-open-b.png",
+    "w": 102,
+    "h": 198,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "radar": {
+    "file": "sprites/radar.png",
+    "w": 139,
+    "h": 140,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "shield-projector": {
+    "file": "sprites/shield-projector.png",
+    "w": 155,
+    "h": 155,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "radar-dish": {
+    "file": "sprites/radar-dish.png",
+    "w": 357,
+    "h": 378,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "defence-ring": {
+    "file": "sprites/defence-ring.png",
+    "w": 376,
+    "h": 389,
+    "sheet": "sheet-24-walls-defence.jpg"
+  },
+  "enemy-crawler-1": {
+    "file": "sprites/enemy-crawler-1.png",
+    "w": 228,
+    "h": 238,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-crawler-2": {
+    "file": "sprites/enemy-crawler-2.png",
+    "w": 352,
+    "h": 324,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-crawler-3": {
+    "file": "sprites/enemy-crawler-3.png",
+    "w": 379,
+    "h": 392,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-spider-1": {
+    "file": "sprites/enemy-spider-1.png",
+    "w": 279,
+    "h": 353,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-spider-2": {
+    "file": "sprites/enemy-spider-2.png",
+    "w": 347,
+    "h": 398,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-spider-3": {
+    "file": "sprites/enemy-spider-3.png",
+    "w": 408,
+    "h": 448,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-drone-1": {
+    "file": "sprites/enemy-drone-1.png",
+    "w": 233,
+    "h": 281,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-drone-2": {
+    "file": "sprites/enemy-drone-2.png",
+    "w": 357,
+    "h": 327,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-drone-3": {
+    "file": "sprites/enemy-drone-3.png",
+    "w": 404,
+    "h": 446,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-swarmling": {
+    "file": "sprites/enemy-swarmling.png",
+    "w": 145,
+    "h": 134,
+    "sheet": "sheet-25-enemies-small.jpg"
+  },
+  "enemy-brute-1": {
+    "file": "sprites/enemy-brute-1.png",
+    "w": 314,
+    "h": 264,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-brute-2": {
+    "file": "sprites/enemy-brute-2.png",
+    "w": 224,
+    "h": 264,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-spitter-2": {
+    "file": "sprites/enemy-spitter-2.png",
+    "w": 241,
+    "h": 261,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-brute-3": {
+    "file": "sprites/enemy-brute-3.png",
+    "w": 438,
+    "h": 266,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-spitter-1": {
+    "file": "sprites/enemy-spitter-1.png",
+    "w": 280,
+    "h": 309,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-bomber": {
+    "file": "sprites/enemy-bomber.png",
+    "w": 218,
+    "h": 194,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-boss-colossus": {
+    "file": "sprites/enemy-boss-colossus.png",
+    "w": 319,
+    "h": 306,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "enemy-boss-queen": {
+    "file": "sprites/enemy-boss-queen.png",
+    "w": 403,
+    "h": 318,
+    "sheet": "sheet-26-enemies-large.jpg"
+  },
+  "nest-small": {
+    "file": "sprites/nest-small.png",
+    "w": 229,
+    "h": 206,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "nest-medium": {
+    "file": "sprites/nest-medium.png",
+    "w": 262,
+    "h": 274,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "nest-large": {
+    "file": "sprites/nest-large.png",
+    "w": 318,
+    "h": 315,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "spawner-pod": {
+    "file": "sprites/spawner-pod.png",
+    "w": 208,
+    "h": 208,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "nest-egg-cluster": {
+    "file": "sprites/nest-egg-cluster.png",
+    "w": 204,
+    "h": 215,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "worm-small": {
+    "file": "sprites/worm-small.png",
+    "w": 206,
+    "h": 170,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "worm-medium": {
+    "file": "sprites/worm-medium.png",
+    "w": 249,
+    "h": 238,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "worm-big": {
+    "file": "sprites/worm-big.png",
+    "w": 303,
+    "h": 280,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "nest-scrap-pile": {
+    "file": "sprites/nest-scrap-pile.png",
+    "w": 242,
+    "h": 250,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "nest-antenna": {
+    "file": "sprites/nest-antenna.png",
+    "w": 194,
+    "h": 291,
+    "sheet": "sheet-27-nests.jpg"
+  },
+  "player-s": {
+    "file": "sprites/player-s.png",
+    "w": 349,
+    "h": 473,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-se": {
+    "file": "sprites/player-se.png",
+    "w": 342,
+    "h": 485,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-s-b": {
+    "file": "sprites/player-s-b.png",
+    "w": 367,
+    "h": 461,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-sw": {
+    "file": "sprites/player-sw.png",
+    "w": 346,
+    "h": 488,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-e": {
+    "file": "sprites/player-e.png",
+    "w": 260,
+    "h": 480,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-ne": {
+    "file": "sprites/player-ne.png",
+    "w": 344,
+    "h": 489,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-n": {
+    "file": "sprites/player-n.png",
+    "w": 349,
+    "h": 478,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-nw": {
+    "file": "sprites/player-nw.png",
+    "w": 343,
+    "h": 489,
+    "sheet": "sheet-28-player-8dir.jpg"
+  },
+  "player-w": {
+    "file": "sprites/player-w.png",
+    "w": 260,
+    "h": 480,
+    "sheet": "sheet-28-player-8dir.jpg",
+    "mirrorOf": "player-e"
+  },
+  "fx-muzzle-flash": {
+    "file": "sprites/fx-muzzle-flash.png",
+    "w": 198,
+    "h": 135,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-explosion-small": {
+    "file": "sprites/fx-explosion-small.png",
+    "w": 119,
+    "h": 115,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-explosion-medium": {
+    "file": "sprites/fx-explosion-medium.png",
+    "w": 237,
+    "h": 237,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-explosion-large": {
+    "file": "sprites/fx-explosion-large.png",
+    "w": 255,
+    "h": 248,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-smoke-2": {
+    "file": "sprites/fx-smoke-2.png",
+    "w": 174,
+    "h": 187,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-spark": {
+    "file": "sprites/fx-spark.png",
+    "w": 187,
+    "h": 181,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-fire": {
+    "file": "sprites/fx-fire.png",
+    "w": 157,
+    "h": 124,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-acid-splash": {
+    "file": "sprites/fx-acid-splash.png",
+    "w": 189,
+    "h": 181,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "fx-oil-splat": {
+    "file": "sprites/fx-oil-splat.png",
+    "w": 191,
+    "h": 183,
+    "sheet": "sheet-30-fx-combat.webp"
+  },
+  "proj-bullet": {
+    "file": "sprites/proj-bullet.png",
+    "w": 216,
+    "h": 36,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-piercing": {
+    "file": "sprites/proj-piercing.png",
+    "w": 241,
+    "h": 65,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-rocket": {
+    "file": "sprites/proj-rocket.png",
+    "w": 260,
+    "h": 73,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-shell": {
+    "file": "sprites/proj-shell.png",
+    "w": 211,
+    "h": 109,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-flame": {
+    "file": "sprites/proj-flame.png",
+    "w": 231,
+    "h": 120,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-acid": {
+    "file": "sprites/proj-acid.png",
+    "w": 259,
+    "h": 120,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-laser": {
+    "file": "sprites/proj-laser.png",
+    "w": 435,
+    "h": 49,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-plasma": {
+    "file": "sprites/proj-plasma.png",
+    "w": 385,
+    "h": 158,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-plasma-b": {
+    "file": "sprites/proj-plasma-b.png",
+    "w": 414,
+    "h": 137,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-grenade": {
+    "file": "sprites/proj-grenade.png",
+    "w": 185,
+    "h": 173,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "proj-artillery": {
+    "file": "sprites/proj-artillery.png",
+    "w": 432,
+    "h": 167,
+    "sheet": "sheet-32-projectiles.jpg"
+  },
+  "ground-1": {
+    "file": "sprites/ground-1.jpg",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ground-2": {
+    "file": "sprites/ground-2.jpg",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ground-3": {
+    "file": "sprites/ground-3.jpg",
+    "w": 337,
+    "h": 326,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ground-4": {
+    "file": "sprites/ground-4.jpg",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ground-5": {
+    "file": "sprites/ground-5.jpg",
+    "w": 337,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "scorched-1": {
+    "file": "sprites/scorched-1.jpg",
+    "w": 337,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "scorched-2": {
+    "file": "sprites/scorched-2.jpg",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ash-drift-1": {
+    "file": "sprites/ash-drift-1.jpg",
+    "w": 337,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ash-drift-2": {
+    "file": "sprites/ash-drift-2.jpg",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "gravel-1": {
+    "file": "sprites/gravel-1.jpg",
+    "w": 337,
+    "h": 327,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "gravel-2": {
+    "file": "sprites/gravel-2.jpg",
+    "w": 336,
+    "h": 328,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "gravel-3": {
+    "file": "sprites/gravel-3.jpg",
+    "w": 336,
+    "h": 328,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "rubble-1": {
+    "file": "sprites/rubble-1.jpg",
+    "w": 337,
+    "h": 328,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "rubble-2": {
+    "file": "sprites/rubble-2.jpg",
+    "w": 337,
+    "h": 328,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "rubble-3": {
+    "file": "sprites/rubble-3.jpg",
+    "w": 337,
+    "h": 328,
+    "sheet": "sheet-33-ground-ash.jpg"
+  },
+  "ore-tile-iron-1": {
+    "file": "sprites/ore-tile-iron-1.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-iron-2": {
+    "file": "sprites/ore-tile-iron-2.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-copper-1": {
+    "file": "sprites/ore-tile-copper-1.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-copper-2": {
+    "file": "sprites/ore-tile-copper-2.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-copper-3": {
+    "file": "sprites/ore-tile-copper-3.png",
+    "w": 337,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-coal-1": {
+    "file": "sprites/ore-tile-coal-1.png",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-coal-2": {
+    "file": "sprites/ore-tile-coal-2.png",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-stone-1": {
+    "file": "sprites/ore-tile-stone-1.png",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-stone-2": {
+    "file": "sprites/ore-tile-stone-2.png",
+    "w": 336,
+    "h": 327,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-stone-3": {
+    "file": "sprites/ore-tile-stone-3.png",
+    "w": 337,
+    "h": 327,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-uranium-1": {
+    "file": "sprites/ore-tile-uranium-1.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-uranium-2": {
+    "file": "sprites/ore-tile-uranium-2.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-scrap-1": {
+    "file": "sprites/ore-tile-scrap-1.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-scrap-2": {
+    "file": "sprites/ore-tile-scrap-2.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "ore-tile-scrap-3": {
+    "file": "sprites/ore-tile-scrap-3.png",
+    "w": 336,
+    "h": 326,
+    "sheet": "sheet-34-ore-fields.jpg"
+  },
+  "rock-1": {
+    "file": "sprites/rock-1.png",
+    "w": 425,
+    "h": 383,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-2": {
+    "file": "sprites/rock-2.png",
+    "w": 437,
+    "h": 394,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-3": {
+    "file": "sprites/rock-3.png",
+    "w": 499,
+    "h": 396,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-4": {
+    "file": "sprites/rock-4.png",
+    "w": 394,
+    "h": 512,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-5": {
+    "file": "sprites/rock-5.png",
+    "w": 465,
+    "h": 286,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-6": {
+    "file": "sprites/rock-6.png",
+    "w": 510,
+    "h": 263,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-7": {
+    "file": "sprites/rock-7.png",
+    "w": 452,
+    "h": 368,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-8": {
+    "file": "sprites/rock-8.png",
+    "w": 512,
+    "h": 305,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-cluster-1": {
+    "file": "sprites/rock-cluster-1.png",
+    "w": 512,
+    "h": 437,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-cluster-2": {
+    "file": "sprites/rock-cluster-2.png",
+    "w": 512,
+    "h": 310,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-cluster-3": {
+    "file": "sprites/rock-cluster-3.png",
+    "w": 512,
+    "h": 370,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "rock-cluster-4": {
+    "file": "sprites/rock-cluster-4.png",
+    "w": 512,
+    "h": 367,
+    "sheet": "sheet-52-obstacle-rocks.jpg"
+  },
+  "tree-1": {
+    "file": "sprites/tree-1.png",
+    "w": 428,
+    "h": 512,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-2": {
+    "file": "sprites/tree-2.png",
+    "w": 441,
+    "h": 512,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-3": {
+    "file": "sprites/tree-3.png",
+    "w": 384,
+    "h": 512,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-4": {
+    "file": "sprites/tree-4.png",
+    "w": 512,
+    "h": 449,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-5": {
+    "file": "sprites/tree-5.png",
+    "w": 219,
+    "h": 512,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-6": {
+    "file": "sprites/tree-6.png",
+    "w": 118,
+    "h": 379,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "stump-1": {
+    "file": "sprites/stump-1.png",
+    "w": 512,
+    "h": 430,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "stump-2": {
+    "file": "sprites/stump-2.png",
+    "w": 398,
+    "h": 391,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-7": {
+    "file": "sprites/tree-7.png",
+    "w": 491,
+    "h": 477,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tree-8": {
+    "file": "sprites/tree-8.png",
+    "w": 428,
+    "h": 512,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "obstacle-trees-extra-11": {
+    "file": "sprites/obstacle-trees-extra-11.png",
+    "w": 455,
+    "h": 397,
+    "sheet": "sheet-53-obstacle-trees.jpg"
+  },
+  "tar-fill-1": {
+    "file": "sprites/tar-fill-1.jpg",
+    "w": 384,
+    "h": 209,
+    "sheet": "sheet-54-obstacle-tar-fill.jpg"
+  },
+  "tar-rim-straight": {
+    "file": "sprites/tar-rim-straight.png",
+    "w": 512,
+    "h": 499,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "tar-rim-corner-out": {
+    "file": "sprites/tar-rim-corner-out.png",
+    "w": 504,
+    "h": 512,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "tar-rim-corner-in": {
+    "file": "sprites/tar-rim-corner-in.png",
+    "w": 507,
+    "h": 512,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "tar-rim-end": {
+    "file": "sprites/tar-rim-end.png",
+    "w": 507,
+    "h": 512,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "fx-tar-bubble": {
+    "file": "sprites/fx-tar-bubble.png",
+    "w": 512,
+    "h": 510,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "fx-tar-burst": {
+    "file": "sprites/fx-tar-burst.png",
+    "w": 512,
+    "h": 479,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "obstacle-tar-rim-extra-7": {
+    "file": "sprites/obstacle-tar-rim-extra-7.png",
+    "w": 328,
+    "h": 215,
+    "sheet": "sheet-55-obstacle-tar-rim.jpg"
+  },
+  "miner-wide": {
+    "file": "sprites/miner-wide.png",
+    "w": 487,
+    "h": 512,
+    "sheet": "sheet-56-drill-wide.jpg"
+  },
+  "miner-wide-active": {
+    "file": "sprites/miner-wide-active.png",
+    "w": 487,
+    "h": 512,
+    "sheet": "sheet-56-drill-wide.jpg"
+  },
+  "ui-settings": {
+    "file": "sprites/ui-settings.png",
+    "w": 308,
+    "h": 309,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-build": {
+    "file": "sprites/ui-build.png",
+    "w": 310,
+    "h": 308,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-research": {
+    "file": "sprites/ui-research.png",
+    "w": 245,
+    "h": 310,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-combat": {
+    "file": "sprites/ui-combat.png",
+    "w": 307,
+    "h": 309,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-combat-b": {
+    "file": "sprites/ui-combat-b.png",
+    "w": 307,
+    "h": 310,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-inventory": {
+    "file": "sprites/ui-inventory.png",
+    "w": 289,
+    "h": 306,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-pause": {
+    "file": "sprites/ui-pause.png",
+    "w": 216,
+    "h": 273,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-play": {
+    "file": "sprites/ui-play.png",
+    "w": 245,
+    "h": 270,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-speed": {
+    "file": "sprites/ui-speed.png",
+    "w": 279,
+    "h": 285,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-speed-b": {
+    "file": "sprites/ui-speed-b.png",
+    "w": 279,
+    "h": 284,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-save": {
+    "file": "sprites/ui-save.png",
+    "w": 302,
+    "h": 300,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-warning": {
+    "file": "sprites/ui-warning.png",
+    "w": 318,
+    "h": 294,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-power": {
+    "file": "sprites/ui-power.png",
+    "w": 217,
+    "h": 322,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ui-map": {
+    "file": "sprites/ui-map.png",
+    "w": 294,
+    "h": 299,
+    "sheet": "sheet-38-ui-icons-a.jpg"
+  },
+  "ore-tin": {
+    "file": "sprites/ore-tin.png",
+    "w": 163,
+    "h": 167,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "ore-lead": {
+    "file": "sprites/ore-lead.png",
+    "w": 170,
+    "h": 166,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "plate-tin": {
+    "file": "sprites/plate-tin.png",
+    "w": 143,
+    "h": 191,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "plate-lead": {
+    "file": "sprites/plate-lead.png",
+    "w": 153,
+    "h": 192,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "plate-bronze": {
+    "file": "sprites/plate-bronze.png",
+    "w": 150,
+    "h": 194,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "charcoal": {
+    "file": "sprites/charcoal.png",
+    "w": 107,
+    "h": 226,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "wood": {
+    "file": "sprites/wood.png",
+    "w": 209,
+    "h": 204,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "gunpowder": {
+    "file": "sprites/gunpowder.png",
+    "w": 201,
+    "h": 213,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "casing-bullet": {
+    "file": "sprites/casing-bullet.png",
+    "w": 67,
+    "h": 236,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "casing-shell": {
+    "file": "sprites/casing-shell.png",
+    "w": 144,
+    "h": 283,
+    "sheet": "sheet-43-ammo-chain-icons.webp"
+  },
+  "robot-drone-1": {
+    "file": "sprites/robot-drone-1.png",
+    "w": 224,
+    "h": 150,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-drone-2": {
+    "file": "sprites/robot-drone-2.png",
+    "w": 474,
+    "h": 266,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-scout": {
+    "file": "sprites/robot-scout.png",
+    "w": 294,
+    "h": 312,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-trooper": {
+    "file": "sprites/robot-trooper.png",
+    "w": 303,
+    "h": 375,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-heavy": {
+    "file": "sprites/robot-heavy.png",
+    "w": 427,
+    "h": 485,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-quad": {
+    "file": "sprites/robot-quad.png",
+    "w": 429,
+    "h": 501,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-artillery": {
+    "file": "sprites/robot-artillery.png",
+    "w": 227,
+    "h": 512,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "robot-titan": {
+    "file": "sprites/robot-titan.png",
+    "w": 444,
+    "h": 512,
+    "sheet": "sheet-44-robots-player.jpg"
+  },
+  "alloy-furnace": {
+    "file": "sprites/alloy-furnace.png",
+    "w": 304,
+    "h": 317,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "charcoal-kiln": {
+    "file": "sprites/charcoal-kiln.png",
+    "w": 242,
+    "h": 324,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "gunpowder-mill": {
+    "file": "sprites/gunpowder-mill.png",
+    "w": 241,
+    "h": 287,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "ammo-press": {
+    "file": "sprites/ammo-press.png",
+    "w": 191,
+    "h": 284,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "shell-forge": {
+    "file": "sprites/shell-forge.png",
+    "w": 230,
+    "h": 263,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "lumber-camp": {
+    "file": "sprites/lumber-camp.png",
+    "w": 316,
+    "h": 341,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "robot-fab-2": {
+    "file": "sprites/robot-fab-2.png",
+    "w": 284,
+    "h": 295,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "robot-fab-3": {
+    "file": "sprites/robot-fab-3.png",
+    "w": 310,
+    "h": 335,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "robot-depot": {
+    "file": "sprites/robot-depot.png",
+    "w": 290,
+    "h": 302,
+    "sheet": "sheet-45-production-machines.jpg"
+  },
+  "ore-tile-tin-1": {
+    "file": "sprites/ore-tile-tin-1.png",
+    "w": 229,
+    "h": 222,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-tin-2": {
+    "file": "sprites/ore-tile-tin-2.png",
+    "w": 229,
+    "h": 222,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-lead-1": {
+    "file": "sprites/ore-tile-lead-1.png",
+    "w": 230,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-lead-2": {
+    "file": "sprites/ore-tile-lead-2.png",
+    "w": 230,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-lead-3": {
+    "file": "sprites/ore-tile-lead-3.png",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-lead-4": {
+    "file": "sprites/ore-tile-lead-4.png",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-lead-5": {
+    "file": "sprites/ore-tile-lead-5.png",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-sulfur-1": {
+    "file": "sprites/ore-tile-sulfur-1.png",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-sulfur-2": {
+    "file": "sprites/ore-tile-sulfur-2.png",
+    "w": 230,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "ore-tile-sulfur-3": {
+    "file": "sprites/ore-tile-sulfur-3.png",
+    "w": 230,
+    "h": 225,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "forest-1": {
+    "file": "sprites/forest-1.jpg",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "forest-2": {
+    "file": "sprites/forest-2.jpg",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "forest-3": {
+    "file": "sprites/forest-3.jpg",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "forest-dead-1": {
+    "file": "sprites/forest-dead-1.jpg",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "forest-dead-2": {
+    "file": "sprites/forest-dead-2.jpg",
+    "w": 229,
+    "h": 223,
+    "sheet": "sheet-46-resource-modules.jpg"
+  },
+  "base-core": {
+    "file": "sprites/base-core.png",
+    "w": 251,
+    "h": 275,
+    "sheet": "sheet-47-base-and-capture.jpg"
+  },
+  "base-core-damaged": {
+    "file": "sprites/base-core-damaged.png",
+    "w": 340,
+    "h": 342,
+    "sheet": "sheet-47-base-and-capture.jpg"
+  },
+  "captured-marker": {
+    "file": "sprites/captured-marker.png",
+    "w": 267,
+    "h": 270,
+    "sheet": "sheet-47-base-and-capture.jpg"
+  },
+  "spawner-wreck": {
+    "file": "sprites/spawner-wreck.png",
+    "w": 270,
+    "h": 319,
+    "sheet": "sheet-47-base-and-capture.jpg"
+  },
+  "enemy-acid-1": {
+    "file": "sprites/enemy-acid-1.png",
+    "w": 270,
+    "h": 268,
+    "sheet": "sheet-26b-acid-spitters.jpg"
+  },
+  "enemy-acid-2": {
+    "file": "sprites/enemy-acid-2.png",
+    "w": 280,
+    "h": 308,
+    "sheet": "sheet-26b-acid-spitters.jpg"
+  },
+  "enemy-acid-3": {
+    "file": "sprites/enemy-acid-3.png",
+    "w": 353,
+    "h": 512,
+    "sheet": "sheet-26b-acid-spitters.jpg"
+  },
+  "enemy-spitter-3": {
+    "file": "sprites/enemy-spitter-3.png",
+    "w": 408,
+    "h": 512,
+    "sheet": "sheet-26b-acid-spitters.jpg"
+  },
+  "fx-smoke-1": {
+    "file": "sprites/fx-smoke-1.png",
+    "w": 391,
+    "h": 395,
+    "sheet": "sheet-30b-smoke.jpg"
+  },
+  "fx-smoke-dust": {
+    "file": "sprites/fx-smoke-dust.png",
+    "w": 350,
+    "h": 365,
+    "sheet": "sheet-30b-smoke.jpg"
+  },
+  "fx-smoke-wisp": {
+    "file": "sprites/fx-smoke-wisp.png",
+    "w": 315,
+    "h": 342,
+    "sheet": "sheet-30b-smoke.jpg"
+  },
+  "base-core-destroyed": {
+    "file": "sprites/base-core-destroyed.png",
+    "w": 263,
+    "h": 512,
+    "sheet": "sheet-47b-structures.jpg"
+  },
+  "robot-fab-1": {
+    "file": "sprites/robot-fab-1.png",
+    "w": 411,
+    "h": 512,
+    "sheet": "sheet-47b-structures.jpg"
+  },
+  "robot-top-drone-1": {
+    "file": "sprites/robot-top-drone-1.png",
+    "w": 95,
+    "h": 136,
+    "sheet": "sheet-44b-robots-topdown.jpg"
+  },
+  "robot-top-drone-2": {
+    "file": "sprites/robot-top-drone-2.png",
+    "w": 212,
+    "h": 228,
+    "sheet": "sheet-44b-robots-topdown.jpg"
+  },
+  "robot-top-scout": {
+    "file": "sprites/robot-top-scout.png",
+    "w": 170,
+    "h": 167,
+    "sheet": "sheet-44b-robots-topdown.jpg"
+  },
+  "robot-top-trooper": {
+    "file": "sprites/robot-top-trooper.png",
+    "w": 192,
+    "h": 131,
+    "sheet": "sheet-44b-robots-topdown.jpg"
+  },
+  "robot-top-artillery": {
+    "file": "sprites/robot-top-artillery.png",
+    "w": 235,
+    "h": 171,
+    "sheet": "sheet-44b-robots-topdown.jpg"
+  },
+  "robot-top-heavy": {
+    "file": "sprites/robot-top-heavy.png",
+    "w": 409,
+    "h": 512,
+    "sheet": "sheet-44c-robots-topdown-big.jpg"
+  },
+  "robot-top-quad": {
+    "file": "sprites/robot-top-quad.png",
+    "w": 447,
+    "h": 512,
+    "sheet": "sheet-44c-robots-topdown-big.jpg"
+  },
+  "robot-top-titan": {
+    "file": "sprites/robot-top-titan.png",
+    "w": 343,
+    "h": 512,
+    "sheet": "sheet-44c-robots-topdown-big.jpg"
+  },
+  "coil-idle": {
+    "file": "sprites/coil-idle.png",
+    "w": 272,
+    "h": 280,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "coil-charged": {
+    "file": "sprites/coil-charged.png",
+    "w": 272,
+    "h": 280,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "generator-lit": {
+    "file": "sprites/generator-lit.png",
+    "w": 277,
+    "h": 313,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "generator-cold": {
+    "file": "sprites/generator-cold.png",
+    "w": 277,
+    "h": 313,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "pole-steel": {
+    "file": "sprites/pole-steel.png",
+    "w": 300,
+    "h": 276,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "pole-wood": {
+    "file": "sprites/pole-wood.png",
+    "w": 304,
+    "h": 287,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "icon-no-power": {
+    "file": "sprites/icon-no-power.png",
+    "w": 246,
+    "h": 255,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "icon-power-ok": {
+    "file": "sprites/icon-power-ok.png",
+    "w": 263,
+    "h": 278,
+    "sheet": "sheet-49-power-storm.jpg"
+  },
+  "fx-bolt-zig": {
+    "file": "sprites/fx-bolt-zig.png",
+    "w": 512,
+    "h": 186,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-bolt-thin": {
+    "file": "sprites/fx-bolt-thin.png",
+    "w": 512,
+    "h": 162,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-bolt-zig-b": {
+    "file": "sprites/fx-bolt-zig-b.png",
+    "w": 512,
+    "h": 196,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-bolt-fork": {
+    "file": "sprites/fx-bolt-fork.png",
+    "w": 512,
+    "h": 454,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-burst": {
+    "file": "sprites/fx-burst.png",
+    "w": 506,
+    "h": 512,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-orb": {
+    "file": "sprites/fx-orb.png",
+    "w": 483,
+    "h": 512,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-ring": {
+    "file": "sprites/fx-ring.png",
+    "w": 510,
+    "h": 512,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-sparks-blue": {
+    "file": "sprites/fx-sparks-blue.png",
+    "w": 512,
+    "h": 452,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "fx-swirl": {
+    "file": "sprites/fx-swirl.png",
+    "w": 512,
+    "h": 499,
+    "sheet": "sheet-50-lightning-fx.jpg"
+  },
+  "underground-express": {
+    "file": "sprites/underground-express.png",
+    "w": 265,
+    "h": 238,
+    "sheet": "derived from underground-fast"
+  }
+}

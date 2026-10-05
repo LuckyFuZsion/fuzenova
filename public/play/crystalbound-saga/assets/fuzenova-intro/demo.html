@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FuzeNova intro demo</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0b0f24;color:#e8ecff;font:16px system-ui,sans-serif}
+  button{font:700 16px system-ui;padding:12px 28px;border-radius:999px;border:0;background:#f6c453;color:#1a1300;cursor:pointer}
+  small{color:#8b93b8}
+</style></head><body>
+<h1 style="margin:0;font-size:20px">FuzeNova Games intro</h1>
+<button id="go">Play intro</button>
+<small>Tap the intro to skip it. Add <code>?t=1.5</code> to the address to freeze a single moment (in seconds).</small>
+<script src="fuzenova-intro.js"></script>
+<script>
+  FuzeNovaIntro.preload();
+  var q = new URLSearchParams(location.search).get('t');
+  document.getElementById('go').onclick = function () {
+    FuzeNovaIntro.play(q != null ? { freezeAt: parseFloat(q), sound: false } : { onDone: function () { console.log('intro finished'); } });
+  };
+  if (q != null) document.getElementById('go').click();
+</script></body></html>

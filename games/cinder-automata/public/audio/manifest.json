@@ -1,0 +1,407 @@
+{
+ "sfx": [
+  {
+   "name": "boss-arrive",
+   "file": "audio/sfx/boss-arrive.mp3",
+   "seconds": 1.48,
+   "kb": 11,
+   "original": "audio/original/boss-arrive.mp3"
+  },
+  {
+   "name": "bullet-hit",
+   "file": "audio/sfx/bullet-hit.mp3",
+   "seconds": 0.48,
+   "kb": 5,
+   "original": "audio/original/bullet-hit.mp3"
+  },
+  {
+   "name": "coil-zap",
+   "file": "audio/sfx/coil-zap.mp3",
+   "seconds": 1.2,
+   "kb": 12,
+   "original": "audio/original/coil-zap.mp3"
+  },
+  {
+   "name": "core-alarm",
+   "file": "audio/sfx/core-alarm.mp3",
+   "seconds": 3.08,
+   "kb": 31,
+   "original": "audio/original/core-alarm.mp3"
+  },
+  {
+   "name": "drop-building",
+   "file": "audio/sfx/drop-building.mp3",
+   "seconds": 0.33,
+   "kb": 4,
+   "original": "audio/original/drop-building.mp3"
+  },
+  {
+   "name": "enemy-death",
+   "file": "audio/sfx/enemy-death.mp3",
+   "seconds": 0.64,
+   "kb": 6,
+   "original": "audio/original/enemy-death.mp3"
+  },
+  {
+   "name": "loop-ambience-ash",
+   "file": "audio/sfx/loop-ambience-ash.mp3",
+   "seconds": 10.58,
+   "kb": 69,
+   "original": "audio/original/loop-ambience-ash.mp3"
+  },
+  {
+   "name": "loop-ambience-fight",
+   "file": "audio/sfx/loop-ambience-fight.mp3",
+   "seconds": 10.58,
+   "kb": 57,
+   "original": "audio/original/loop-ambience-fight.mp3"
+  },
+  {
+   "name": "loop-assembler",
+   "file": "audio/sfx/loop-assembler.mp3",
+   "seconds": 3.48,
+   "kb": 41,
+   "original": "audio/original/loop-assembler.mp3"
+  },
+  {
+   "name": "loop-belt",
+   "file": "audio/sfx/loop-belt.mp3",
+   "seconds": 4.48,
+   "kb": 45,
+   "original": "audio/original/loop-belt.mp3"
+  },
+  {
+   "name": "loop-coil-idle",
+   "file": "audio/sfx/loop-coil-idle.mp3",
+   "seconds": 4.96,
+   "kb": 81,
+   "original": "audio/original/loop-coil-idle.mp3"
+  },
+  {
+   "name": "loop-drill",
+   "file": "audio/sfx/loop-drill.mp3",
+   "seconds": 3.68,
+   "kb": 37,
+   "original": "audio/original/loop-drill.mp3"
+  },
+  {
+   "name": "loop-generator",
+   "file": "audio/sfx/loop-generator.mp3",
+   "seconds": 4.96,
+   "kb": 53,
+   "original": "audio/original/loop-generator.mp3"
+  },
+  {
+   "name": "loop-smelter",
+   "file": "audio/sfx/loop-smelter.mp3",
+   "seconds": 4.48,
+   "kb": 56,
+   "original": "audio/original/loop-smelter.mp3"
+  },
+  {
+   "name": "pickup",
+   "file": "audio/sfx/pickup.mp3",
+   "seconds": 0.4,
+   "kb": 6,
+   "original": "audio/original/pickup.mp3"
+  },
+  {
+   "name": "place-belt-2",
+   "file": "audio/sfx/place-belt-2.mp3",
+   "seconds": 0.68,
+   "kb": 10,
+   "original": "audio/original/place-belt-2.mp3"
+  },
+  {
+   "name": "place-belt-3",
+   "file": "audio/sfx/place-belt-3.mp3",
+   "seconds": 0.52,
+   "kb": 7,
+   "original": "audio/original/place-belt-3.mp3"
+  },
+  {
+   "name": "place-belt-4",
+   "file": "audio/sfx/place-belt-4.mp3",
+   "seconds": 0.48,
+   "kb": 6,
+   "original": "audio/original/place-belt-4.mp3"
+  },
+  {
+   "name": "place-belt",
+   "file": "audio/sfx/place-belt.mp3",
+   "seconds": 0.4,
+   "kb": 5,
+   "original": "audio/original/place-belt.mp3"
+  },
+  {
+   "name": "place-building-2",
+   "file": "audio/sfx/place-building-2.mp3",
+   "seconds": 0.7,
+   "kb": 6,
+   "original": "audio/original/place-building-2.mp3"
+  },
+  {
+   "name": "place-building-3",
+   "file": "audio/sfx/place-building-3.mp3",
+   "seconds": 0.8,
+   "kb": 7,
+   "original": "audio/original/place-building-3.mp3"
+  },
+  {
+   "name": "place-building-4",
+   "file": "audio/sfx/place-building-4.mp3",
+   "seconds": 0.8,
+   "kb": 7,
+   "original": "audio/original/place-building-4.mp3"
+  },
+  {
+   "name": "place-building",
+   "file": "audio/sfx/place-building.mp3",
+   "seconds": 0.8,
+   "kb": 7,
+   "original": "audio/original/place-building.mp3"
+  },
+  {
+   "name": "remove-building-2",
+   "file": "audio/sfx/remove-building-2.mp3",
+   "seconds": 0.78,
+   "kb": 12,
+   "original": "audio/original/remove-building-2.mp3"
+  },
+  {
+   "name": "remove-building-3",
+   "file": "audio/sfx/remove-building-3.mp3",
+   "seconds": 0.8,
+   "kb": 10,
+   "original": "audio/original/remove-building-3.mp3"
+  },
+  {
+   "name": "remove-building-4",
+   "file": "audio/sfx/remove-building-4.mp3",
+   "seconds": 0.67,
+   "kb": 11,
+   "original": "audio/original/remove-building-4.mp3"
+  },
+  {
+   "name": "remove-building",
+   "file": "audio/sfx/remove-building.mp3",
+   "seconds": 0.76,
+   "kb": 11,
+   "original": "audio/original/remove-building.mp3"
+  },
+  {
+   "name": "robot-shot",
+   "file": "audio/sfx/robot-shot.mp3",
+   "seconds": 0.48,
+   "kb": 4,
+   "original": "audio/original/robot-shot.mp3"
+  },
+  {
+   "name": "rotate-2",
+   "file": "audio/sfx/rotate-2.mp3",
+   "seconds": 0.5,
+   "kb": 8,
+   "original": "audio/original/rotate-2.mp3"
+  },
+  {
+   "name": "rotate-3",
+   "file": "audio/sfx/rotate-3.mp3",
+   "seconds": 0.56,
+   "kb": 9,
+   "original": "audio/original/rotate-3.mp3"
+  },
+  {
+   "name": "rotate-4",
+   "file": "audio/sfx/rotate-4.mp3",
+   "seconds": 0.59,
+   "kb": 8,
+   "original": "audio/original/rotate-4.mp3"
+  },
+  {
+   "name": "rotate",
+   "file": "audio/sfx/rotate.mp3",
+   "seconds": 0.6,
+   "kb": 8,
+   "original": "audio/original/rotate.mp3"
+  },
+  {
+   "name": "structure-destroyed",
+   "file": "audio/sfx/structure-destroyed.mp3",
+   "seconds": 1.33,
+   "kb": 14,
+   "original": "audio/original/structure-destroyed.mp3"
+  },
+  {
+   "name": "structure-hit",
+   "file": "audio/sfx/structure-hit.mp3",
+   "seconds": 1,
+   "kb": 9,
+   "original": "audio/original/structure-hit.mp3"
+  },
+  {
+   "name": "ui-build-start",
+   "file": "audio/sfx/ui-build-start.mp3",
+   "seconds": 2.46,
+   "kb": 27,
+   "original": "audio/original/ui-build-start.mp3"
+  },
+  {
+   "name": "ui-click",
+   "file": "audio/sfx/ui-click.mp3",
+   "seconds": 0.24,
+   "kb": 3,
+   "original": "audio/original/ui-click.mp3"
+  },
+  {
+   "name": "ui-defeat",
+   "file": "audio/sfx/ui-defeat.mp3",
+   "seconds": 2.1,
+   "kb": 17,
+   "original": "audio/original/ui-defeat.mp3"
+  },
+  {
+   "name": "ui-denied",
+   "file": "audio/sfx/ui-denied.mp3",
+   "seconds": 1.11,
+   "kb": 9,
+   "original": "audio/original/ui-denied.mp3"
+  },
+  {
+   "name": "ui-fight-start",
+   "file": "audio/sfx/ui-fight-start.mp3",
+   "seconds": 4.48,
+   "kb": 39,
+   "original": "audio/original/ui-fight-start.mp3"
+  },
+  {
+   "name": "ui-level-complete",
+   "file": "audio/sfx/ui-level-complete.mp3",
+   "seconds": 3.37,
+   "kb": 29,
+   "original": "audio/original/ui-level-complete.mp3"
+  },
+  {
+   "name": "ui-open",
+   "file": "audio/sfx/ui-open.mp3",
+   "seconds": 1.11,
+   "kb": 12,
+   "original": "audio/original/ui-open.mp3"
+  },
+  {
+   "name": "ui-star",
+   "file": "audio/sfx/ui-star.mp3",
+   "seconds": 1.99,
+   "kb": 14,
+   "original": "audio/original/ui-star.mp3"
+  }
+ ],
+ "alt": [
+  {
+   "name": "build-classic",
+   "file": "audio/alt/build-classic.mp3",
+   "seconds": 190.68,
+   "kb": 2980,
+   "original": null
+  },
+  {
+   "name": "ui-build-start-short",
+   "file": "audio/alt/ui-build-start-short.mp3",
+   "seconds": 0.98,
+   "kb": 10,
+   "original": "audio/original/ui-build-start-short.mp3"
+  },
+  {
+   "name": "ui-defeat-b",
+   "file": "audio/alt/ui-defeat-b.mp3",
+   "seconds": 2.6,
+   "kb": 18,
+   "original": "audio/original/ui-defeat-b.mp3"
+  },
+  {
+   "name": "ui-denied-b",
+   "file": "audio/alt/ui-denied-b.mp3",
+   "seconds": 1.11,
+   "kb": 9,
+   "original": "audio/original/ui-denied-b.mp3"
+  },
+  {
+   "name": "ui-denied-c",
+   "file": "audio/alt/ui-denied-c.mp3",
+   "seconds": 1.11,
+   "kb": 9,
+   "original": "audio/original/ui-denied-c.mp3"
+  },
+  {
+   "name": "ui-fight-start-short",
+   "file": "audio/alt/ui-fight-start-short.mp3",
+   "seconds": 2.1,
+   "kb": 19,
+   "original": "audio/original/ui-fight-start-short.mp3"
+  },
+  {
+   "name": "ui-star-a",
+   "file": "audio/alt/ui-star-a.mp3",
+   "seconds": 2.67,
+   "kb": 29,
+   "original": "audio/original/ui-star-a.mp3"
+  },
+  {
+   "name": "ui-star-b",
+   "file": "audio/alt/ui-star-b.mp3",
+   "seconds": 2.67,
+   "kb": 24,
+   "original": "audio/original/ui-star-b.mp3"
+  },
+  {
+   "name": "ui-star-c",
+   "file": "audio/alt/ui-star-c.mp3",
+   "seconds": 2.67,
+   "kb": 28,
+   "original": "audio/original/ui-star-c.mp3"
+  }
+ ],
+ "music": [
+  {
+   "name": "boss",
+   "file": "audio/music/boss.mp3",
+   "seconds": 175.2,
+   "kb": 2738,
+   "original": null
+  },
+  {
+   "name": "build",
+   "file": "audio/music/build.mp3",
+   "seconds": 291.92,
+   "kb": 4562,
+   "original": null
+  },
+  {
+   "name": "defeat",
+   "file": "audio/music/defeat.mp3",
+   "seconds": 18.25,
+   "kb": 286,
+   "original": null
+  },
+  {
+   "name": "fight-1",
+   "file": "audio/music/fight-1.mp3",
+   "seconds": 122,
+   "kb": 1907,
+   "original": null
+  },
+  {
+   "name": "menu",
+   "file": "audio/music/menu.mp3",
+   "seconds": 111.92,
+   "kb": 1750,
+   "original": null
+  },
+  {
+   "name": "victory",
+   "file": "audio/music/victory.mp3",
+   "seconds": 19.6,
+   "kb": 307,
+   "original": null
+  }
+ ]
+}

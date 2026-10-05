@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cinder Automata - FuzeNova Games</title>
+  <meta name="description" content="Cinder Automata: build an automated factory on a burnt world. A FuzeNova Games production." />
+  <meta name="theme-color" content="#120e0c" />
+  <link rel="canonical" href="https://fuzenova.tech/play/cinder-automata/index.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="FuzeNova Games" />
+  <meta property="og:title" content="Cinder Automata - FuzeNova Games" />
+  <meta property="og:description" content="Mine. Smelt. Automate. Hold the line. Build an automated factory on a burnt world and defend your core. Free to play in your browser." />
+  <meta property="og:url" content="https://fuzenova.tech/play/cinder-automata/index.html" />
+  <meta property="og:image" content="https://fuzenova.tech/play/cinder-automata/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Cinder Automata: a shield logo beside a glowing core defended by turrets and a Titan" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cinder Automata - FuzeNova Games" />
+  <meta name="twitter:description" content="Mine. Smelt. Automate. Hold the line. Free to play in your browser." />
+  <meta name="twitter:image" content="https://fuzenova.tech/play/cinder-automata/og-image.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="./icons/favicon.png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" hidden>
+    <div id="toolbar"><div class="tbrow">
+    <button id="menuBtn" title="Menu (Esc)"><span>&#9776;</span> Menu</button>
+    <button id="keysBtn" title="Show or hide the controls (F2)"><kbd>F2</kbd> Controls</button>
+    <button id="inspectBtn" title="Inspect mode: hover anything to see how it works (F3)"><kbd>F3</kbd> Inspect</button>
+    <button id="researchBtn" title="Research: upgrade your weapons, robots and defences (T)"><kbd>T</kbd> <img class="hi" src="./sprites/hud-research.png" alt="">Research</button>
+    <button id="muteBtn" title="Sound on or off (N)"><kbd>N</kbd> <span id="muteIcon">Sound on</span></button>
+    </div>
+    <div id="keys"></div></div>
+    <div id="stats"></div>
+    <div id="round">
+      <div class="lvl">Level <b id="lvl">1</b></div>
+      <div id="phase" class="build"></div>
+      <div id="omenChip" hidden><img alt=""><span></span></div>
+      <div class="hpbar"><i id="hp"></i></div>
+      <div id="cooldown" hidden><span class="cd-title"><img class="hi" src="./sprites/hud-cooldown.png" alt="">Cooldown</span><b id="cdTime">0:30</b><span class="cd-note">The factory is running: mine, smelt and build</span><i class="cd-bar"><u id="cdBar"></u></i></div>
+      <div id="sub"></div>
+      <div id="speed" title="Game speed (F)"><button data-speed="1" class="on">1x</button><button data-speed="2">2x</button><button data-speed="4">4x</button></div>
+      <button id="startFight">Start fight now</button>
+      <button id="callWave" hidden>Call next wave now</button>
+    </div>
+    <canvas id="minimap" width="190" height="190" title="Minimap: click or drag to move the camera"></canvas>
+    <div id="tutorial" hidden></div>
+    <div id="dock">
+      <div id="toolhelp" hidden></div>
+      <div id="info"></div>
+      <div id="bar"></div>
+    </div>
+  </div>
+
+  <div id="tip" hidden></div>
+  <div id="inspect" hidden></div>
+  <div id="research" hidden></div>
+  <div id="filter" hidden></div>
+  <div id="picker" hidden></div>
+
+  <div id="menu" hidden></div>
+
+  <div id="pauseOverlay" hidden><div><b>Paused</b><span>Press <kbd>P</kbd> to resume</span></div></div>
+  <div id="result" hidden>
+    <div class="card">
+      <h2 id="resultTitle"></h2>
+      <p id="resultText"></p>
+      <div id="modules" hidden></div>
+      <button id="resultBtn"></button>
+    </div>
+  </div>
+
+  <div id="commanders" hidden></div>
+  <div id="auth" hidden></div>
+
+  <div id="title">
+    <div class="titlebox">
+      <h1><img id="logo" src="./logo/logo-shield.png" alt="Cinder Automata" onerror="this.replaceWith(document.createTextNode('Cinder Automata'))" /></h1>
+      <p>Mine. Smelt. Automate. Rebuild the burnt world one machine at a time.</p>
+      <button id="continue" hidden>Continue</button>
+      <button id="start">Start building</button>
+      <button id="tut" class="secondary">How to play (tutorial)</button>
+      <button id="install" class="secondary" hidden>Install as an app</button>
+      <p id="iosHint" class="small" hidden>To install on iPhone or iPad: tap Share, then "Add to Home Screen".</p>
+      <p id="acct" class="small" hidden>Signed in as <b id="acctName"></b> &middot; <span id="acctSync">saved to your account</span> &middot; <button id="signout" class="linklike" type="button">Sign out</button></p>
+      <small>Early prototype &middot; keyboard and mouse &middot; FuzeNova Games</small>
+    </div>
+  </div>
+
+  <!-- FuzeNova Games studio intro (same component as Crystalbound Saga); finds its assets/ next to itself -->
+  <script src="./fuzenova-intro/fuzenova-intro.js"></script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

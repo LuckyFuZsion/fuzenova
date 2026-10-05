@@ -1,0 +1,22 @@
+{
+  "name": "cinder-automata",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5177 --strictPort --host 127.0.0.1",
+    "build": "node tools/build-sound-manifest.mjs && tsc --noEmit && vite build && node tools/build-pwa.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "gdd": "tsx tools/build-gdd.ts",
+    "tester": "node tools/make-tester-pack.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  }
+}

@@ -1,0 +1,24 @@
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+
+# Environment variables
+.env*.local
+.env
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+*.tsbuildinfo
+.turbo/
+
+# Cinder Automata local tooling / one-off outputs
+games/cinder-automata/release/
+games/cinder-automata/dist/
+games/cinder-automata/.claude/
+games/cinder-automata/.cursor/

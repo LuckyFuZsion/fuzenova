@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cinder Automata - prompt pack</title>
+<style>
+:root{--bg:#120e0c;--panel:#1c1613;--line:#3a2f28;--text:#ece4da;--dim:#a89c8e;--accent:#ff8a1f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+h1{margin:0 0 4px}h2{margin:36px 0 12px;color:var(--accent);font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.sub{color:var(--dim)}.bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap;z-index:5}
+.progress{flex:1;min-width:160px;height:8px;background:var(--panel);border-radius:4px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 12px}
+.card.is-done{opacity:.45}.card header{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.card h3{margin:0;font-size:16px}.meta{color:var(--dim);font-size:13px}.done{margin-left:auto;font-size:13px;color:var(--dim);order:3}
+.file{color:var(--dim);font-size:13px;margin:6px 0}code{background:#000;padding:1px 6px;border-radius:4px;color:#e8c77a}
+pre{white-space:pre-wrap;background:#0d0a09;border:1px solid var(--line);border-radius:8px;padding:12px;font:13px/1.45 ui-monospace,Consolas,monospace;max-height:220px;overflow:auto}
+button{background:var(--accent);color:#1a0e02;border:0;border-radius:8px;padding:8px 16px;font:600 14px system-ui;cursor:pointer}button.ok{background:#5ec27a}
+.filters label{margin-right:10px;color:var(--dim);cursor:pointer}
+@media(max-width:600px){.done{margin-left:0}}
+</style></head><body><main>
+<h1>Cinder Automata prompt pack</h1>
+<p class="sub">17 sheets, 164 objects. Attach a finished sheet (e.g. sheet 01) as the style reference to every prompt. Copy buttons include the full style block.</p>
+<div class="bar"><span id="count"></span><div class="progress"><i id="fill"></i></div>
+<span class="filters"><label><input type="checkbox" id="hideDone"> hide generated</label></span></div>
+<section data-tier="1"><h2>Tier 1 - the fight loop: combat, robots, ammo chain, resources</h2>
+<article class="card" data-id="s51">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s51"> generated</label>
+    <h3>Sheet 51 - Wall pieces: single block and damage states</h3><span class="meta">5 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-51-walls-extra.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+These are 1x1 tile pieces for walls, all in exactly the same style, size and viewing angle so the damage states can replace each other on the map.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Wall pieces: single block and damage states. Draw exactly 5 separate objects in a neat grid of about 3 per row, in this reading order (left to right, top row first):
+
+1. a single free-standing wall block, riveted dark steel and concrete, 1x1, no connections on any side
+2. the same wall block lightly damaged: scorch marks and a small crack, 1x1
+3. the same wall block heavily damaged: big cracks, missing chunk, glowing embers in the gaps, 1x1
+4. a small pile of broken wall rubble left after a wall is destroyed, 1x1
+5. a smoking scorch mark and sparks decal to lay on top of a damaged gun turret, 2x2
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s51">Copy prompt</button>
+</article>
+<article class="card" data-id="s52">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s52"> generated</label>
+    <h3>Sheet 52 - Obstacles: boulders</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-52-obstacle-rocks.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+These are obstacles the player cannot build on or walk through. They must read instantly as solid, heavy and natural, and be clearly different from the player's metal machines. Keep the palette cool grey-brown with only a little ember-orange. All objects lit from the top-left.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Obstacles: boulders. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. a single dark weathered boulder, rounded, about 1x1 tile, lit from the top-left, soft contact shadow underneath
+2. a single jagged angular boulder with a flat top, about 1x1 tile
+3. a single boulder with a long crack and a few small stones beside it, about 1x1 tile
+4. a single tall pointed rock spire seen from above with long shadow, about 1x1 tile
+5. two small boulders touching each other, about 1x1 tile
+6. a flat slab of rock with a chipped edge, about 1x1 tile
+7. a single rust-stained boulder with ember-orange mineral veins, about 1x1 tile
+8. a single ash-covered boulder, half buried in grey ash, about 1x1 tile
+9. a tight heap of four boulders of different sizes, about 2x2 tiles
+10. a low rocky outcrop with a ridge running across it, about 2x2 tiles
+11. a pile of scattered rubble and three boulders, about 2x2 tiles
+12. a large rock formation with a cleft down the middle, about 2x2 tiles
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s52">Copy prompt</button>
+</article>
+<article class="card" data-id="s53">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s53"> generated</label>
+    <h3>Sheet 53 - Obstacles: burnt trees and stumps</h3><span class="meta">10 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-53-obstacle-trees.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Burnt, dead trees for an ash-covered wasteland. Seen directly from above, so you look down on the branches. Mostly black and dark brown, with tiny ember glows. No leaves except where stated. Thick dark outline like the reference.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Obstacles: burnt trees and stumps. Draw exactly 10 separate objects in a neat grid of about 5 per row, in this reading order (left to right, top row first):
+
+1. a burnt dead tree seen from above: a charred black trunk with bare twisting branches spreading out, a few glowing embers, about 1x1 tile
+2. a different burnt tree with thin crooked branches and a split trunk, about 1x1 tile
+3. a burnt tree leaning, branches mostly snapped off, about 1x1 tile
+4. a large charred tree with many spreading branches and a smouldering crown, about 1x1 tile
+5. a cluster of three thin blackened dead saplings, about 1x1 tile
+6. a fallen charred log with snapped branches, about 1x1 tile
+7. a burnt tree stump with split wood and a few embers, about 1x1 tile
+8. a large hollow charred stump, about 1x1 tile
+9. a burnt tree with a few remaining sickly pale-green leaves, about 1x1 tile
+10. a tangled thorny dead bush of black twigs, about 1x1 tile
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s53">Copy prompt</button>
+</article>
+<article class="card" data-id="s54">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s54"> generated</label>
+    <h3>Sheet 54 - Obstacles: tar pit surface</h3><span class="meta">4 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-54-obstacle-tar-fill.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Each item is a perfectly square, edge-to-edge filled tile texture with no magenta inside the square and no border. Tiles must be able to sit beside copies of themselves without a visible seam. Leave clear magenta gaps BETWEEN the tiles.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Obstacles: tar pit surface. Draw exactly 4 separate objects in a neat grid of about 2 per row, in this reading order (left to right, top row first):
+
+1. a seamless square tile of thick black tar with a dull oily rainbow sheen and a few slow ripples
+2. a seamless square tile of black tar with two small bubbles and a soft blue-violet sheen
+3. a seamless square tile of black tar with a faint swirl pattern
+4. a seamless square tile of black tar with a few tiny ember-orange reflections
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s54">Copy prompt</button>
+</article>
+<article class="card" data-id="s55">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s55"> generated</label>
+    <h3>Sheet 55 - Obstacles: tar pit edges and bubbles</h3><span class="meta">6 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-55-obstacle-tar-rim.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Edge pieces for tar pits, drawn so they tile together with a flat black tar fill. The tar colour must match: near-black with a faint blue-violet sheen.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Obstacles: tar pit edges and bubbles. Draw exactly 6 separate objects in a neat grid of about 3 per row, in this reading order (left to right, top row first):
+
+1. a straight 1x1 piece of the edge of a tar pit: black tar on one side, a crusty lip of dried tar and pebbles on the other, tar on the bottom half of the tile
+2. a 1x1 outside corner of a tar pit edge: the tar curves away, with a crusty lip of dried tar and pebbles
+3. a 1x1 inside corner of a tar pit edge: tar fills most of the tile with a crusty lip in one corner
+4. a 1x1 rounded end of a narrow tar channel with a crusty lip of dried tar
+5. a single glossy tar bubble about to pop, seen from above, with a ring ripple
+6. a small burst of tar droplets from a popped bubble, seen from above
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s55">Copy prompt</button>
+</article>
+<article class="card" data-id="s56">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s56"> generated</label>
+    <h3>Sheet 56 - Mining drill, 3x2</h3><span class="meta">2 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-56-drill-wide.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+One 3x2 drill, drawn horizontally (3 wide, 2 tall). The two glowing output ports must be exactly in the middle of the two long edges. Rusted dark metal with ember-orange glow accents like the reference.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Mining drill, 3x2. Draw exactly 2 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. a heavy industrial mining drill seen from above, 3 tiles wide and 2 tiles tall: a big rotating drill head with teeth in the centre, a hopper box at each end, riveted metal plating, and a glowing amber output port in the middle of the top edge and in the middle of the bottom edge
+2. the same 3x2 mining drill with the drill head blurred as if spinning, sparks and ore dust around it, the output ports glowing brighter
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s56">Copy prompt</button>
+</article></section><section data-tier="2"><h2>Tier 2 - depth and polish</h2>
+<article class="card" data-id="s31">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s31"> generated</label>
+    <h3>Sheet 31 - World effects</h3><span class="meta">10 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-31-fx-world.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+These are visual effects: they may have soft glowing edges but need solid bright cores, and no magenta inside them.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: World effects. Draw exactly 10 separate objects in a neat grid of about 5 per row, in this reading order (left to right, top row first):
+
+1. blue-white lightning arc
+2. red laser impact flare
+3. soft green healing glow with plus sparkles
+4. orange welding sparkle burst
+5. brown dust cloud
+6. sickly green radiation glow ring
+7. white steam puff
+8. cluster of floating embers
+9. thin grey fog wisp
+10. glowing ring placement marker
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s31">Copy prompt</button>
+</article>
+<article class="card" data-id="s35">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s35"> generated</label>
+    <h3>Sheet 35 - Terrain features</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-35-terrain.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Each item is a perfectly square, edge-to-edge filled tile texture with no magenta inside the square and no border. Tiles must be able to sit beside copies of themselves without a visible seam. Leave clear magenta gaps BETWEEN the tiles.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Terrain features. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. dark deep water
+2. lighter shallow murky water
+3. toxic green pool
+4. black rock with glowing lava cracks
+5. straight cliff edge, dark rock face at the bottom
+6. outer cliff corner
+7. inner cliff corner
+8. cliff end cap
+9. rippled ash dune
+10. impact crater
+11. pale cracked salt flat
+12. wet dark mud
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s35">Copy prompt</button>
+</article>
+<article class="card" data-id="s36">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s36"> generated</label>
+    <h3>Sheet 36 - World decoration</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-36-decor.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: World decoration. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. small dark boulder, 1x1
+2. medium boulder, 2x2
+3. large rock formation, 3x3
+4. charred dead tree seen from above, 2x2
+5. different charred tree, 2x2
+6. burnt stump, 1x1
+7. grey dry bush, 1x1
+8. scattered bones, 1x1
+9. rusted wrecked machine, 2x2
+10. pale glowing fungus cluster, 1x1
+11. pile of scrap metal, 2x2
+12. small crater with a raised rim, 2x2
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s36">Copy prompt</button>
+</article>
+<article class="card" data-id="s39">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s39"> generated</label>
+    <h3>Sheet 39 - UI icons: utility</h3><span class="meta">13 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-39-ui-icons-b.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Flat game-UI art: bold simple front-on shapes, thick dark outline, ember-orange as the single accent colour, no text or letters. (This sheet is NOT top-down machines.)
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: UI icons: utility. Draw exactly 13 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. X mark
+2. tick mark
+3. right arrow
+4. plus sign
+5. minus sign
+6. bin
+7. circular arrow
+8. padlock
+9. eye
+10. magnifying glass
+11. filled gold star (commander star rating)
+12. empty outlined grey star (an unearned star)
+13. clock face without numbers
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s39">Copy prompt</button>
+</article>
+<article class="card" data-id="s40">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s40"> generated</label>
+    <h3>Sheet 40 - UI frames (flat elements)</h3><span class="meta">10 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-40-ui-frames.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Flat game-UI art: bold simple front-on shapes, thick dark outline, ember-orange as the single accent colour, no text or letters. (This sheet is NOT top-down machines.)
+
+Flat front-on UI art, NOT top-down machines. No text anywhere.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: UI frames (flat elements). Draw exactly 10 separate objects in a neat grid of about 5 per row, in this reading order (left to right, top row first):
+
+1. large rectangular panel frame with corner rivets, empty inside
+2. wide rectangular button, normal state, empty
+3. same button, lit orange edge
+4. same button, pressed in
+5. square inventory slot, empty
+6. same slot with an orange selection outline
+7. long thin progress bar frame, empty
+8. long thin ember-orange bar fill
+9. small rectangular tooltip frame with a pointer notch
+10. wide title banner plate, empty
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s40">Copy prompt</button>
+</article>
+<article class="card" data-id="s41">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s41"> generated</label>
+    <h3>Sheet 41 - Research tree icons</h3><span class="meta">16 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-41-tech-icons.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Flat game-UI art: bold simple front-on shapes, thick dark outline, ember-orange as the single accent colour, no text or letters. (This sheet is NOT top-down machines.)
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Research tree icons. Draw exactly 16 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. assembler arm
+2. conveyor belt
+3. lightning pole
+4. steel ingot with flame
+5. oil drop and derrick
+6. pipe and valve
+7. bullet
+8. shield
+9. rail track
+10. flying robot
+11. laser beam
+12. atom symbol
+13. gear with up arrow
+14. gear with a lightning streak
+15. rocket
+16. belt with pouches
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s41">Copy prompt</button>
+</article>
+<article class="card" data-id="s48">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s48"> generated</label>
+    <h3>Sheet 48 - Commander portraits</h3><span class="meta">8 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-48-commanders.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Flat game-UI art: bold simple front-on shapes, thick dark outline, ember-orange as the single accent colour, no text or letters. (This sheet is NOT top-down machines.)
+
+Character portraits, NOT icons: head-and-shoulders busts, front-facing, in the same painted style with thick dark outlines and ember-orange accent light. No text. Keep the framing and scale identical for all eight so they form a matching set.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Commander portraits. Draw exactly 8 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. Gunnery Chief Brakka Vesh: scarred veteran with a bandolier and a heavy jaw
+2. The Foundry Regent: a sleek robot head with a single glowing orange eye and a crown-like crest
+3. Stormwarden Ilka Thorne: hair lifted by static, crackling blue lightning around the shoulders
+4. Marshal Ozric Bellwether: grey-bearded officer in a peaked cap with medals
+5. Cinder Queen Ysolde Ash: soot-streaked, ember-lit face, hair like flickering flame
+6. Forewoman Tamsin Brassgate: hard hat, goggles pushed up, spanner over the shoulder
+7. Doctor Pim Quillfeather: round glasses, wild hair, a tiny drone perched on the shoulder
+8. Bastion Grimwald Oaksworn: huge broad figure in heavy plate armour
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s48">Copy prompt</button>
+</article></section><section data-tier="3"><h2>Tier 3 - optional extras</h2>
+<article class="card" data-id="s09">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s09"> generated</label>
+    <h3>Sheet 09 - Tools and equipment</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-09-equipment.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+These are small inventory-style icons: each is a single flat object seen from directly above, with a chunky, thick, clean silhouette that stays readable when shrunk to 24 pixels.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Tools and equipment. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. iron pickaxe
+2. repair hammer
+3. light armour vest
+4. heavy armour chestplate
+5. exoskeleton leg module
+6. energy shield emitter
+7. night vision goggles
+8. personal battery pack
+9. wearable solar panel
+10. rolled blueprint sheet
+11. closed blueprint book
+12. planner tablet with red cross
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s09">Copy prompt</button>
+</article>
+<article class="card" data-id="s11">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s11"> generated</label>
+    <h3>Sheet 11 - Upgrade modules</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-11-modules.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+These are small inventory-style icons: each is a single flat object seen from directly above, with a chunky, thick, clean silhouette that stays readable when shrunk to 24 pixels.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Upgrade modules. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. small square module chip, blue accent, one pip
+2. blue accent, two pips
+3. blue accent, three pips
+4. green accent, one pip
+5. green accent, two pips
+6. green accent, three pips
+7. purple accent, one pip
+8. purple accent, two pips
+9. purple accent, three pips
+10. blank grey module chip
+11. empty module socket slot
+12. antenna module with pulse rings
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s11">Copy prompt</button>
+</article>
+<article class="card" data-id="s29">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s29"> generated</label>
+    <h3>Sheet 29 - Player engineer, actions</h3><span class="meta">8 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-29-player-actions.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Everything here is drawn top-down, facing right unless stated otherwise, in the same painted style, with no ground shadow.
+
+Same character, scale and proportions as the 8-direction sheet.
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Player engineer, actions. Draw exactly 8 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. engineer swinging a pickaxe, facing right
+2. engineer aiming a rifle, facing right
+3. engineer holding a wrench over a machine, facing right
+4. engineer carrying a crate, facing right
+5. engineer collapsed on the ground
+6. engineer wading, upper body only, facing right
+7. engineer seated (helmet and shoulders only), facing right
+8. engineer with arms raised
+
+Leave generous empty magenta space around every object. Do not draw any text.</pre>
+  <button data-copy="s29">Copy prompt</button>
+</article>
+<article class="card" data-id="s42">
+  <header>
+    <label class="done"><input type="checkbox" data-done="s42"> generated</label>
+    <h3>Sheet 42 - Achievement badges</h3><span class="meta">12 objects</span>
+  </header>
+  <div class="file">save as <code>art/raw/sheet-42-badges.png</code></div>
+  <pre>Art style for a 2D top-down factory-building game called "Cinder Automata": a burnt, ash-covered alien world rebuilt with rugged industrial machines. Hand-painted digital game art with clean readable silhouettes, soft ambient occlusion, subtle worn-metal texture, thick dark outlines, muted charcoal / rust / soot-grey palette with warm ember-orange and amber glow accents. Strict top-down orthographic view (looking straight down, no perspective), lit from the top-left. NO cast shadows on the background, no text, no labels, no numbers, no borders, no grid lines, no watermark. Every object sits on a perfectly flat solid pure magenta (#FF00FF) background, with generous empty magenta space between objects so no two objects touch or overlap. Do not use magenta anywhere inside the objects.
+
+Flat game-UI art: bold simple front-on shapes, thick dark outline, ember-orange as the single accent colour, no text or letters. (This sheet is NOT top-down machines.)
+
+Match the art style, palette, outline weight and lighting of the attached reference image exactly.
+
+Sheet: Achievement badges. Draw exactly 12 separate objects in a neat grid of about 4 per row, in this reading order (left to right, top row first):
+
+1. badge with an iron plate
+2. badge with a belt
+3. badge with a bolt
+4. badge with a flask
+5. badge with a stack of machines
+6. badge with a shield
+7. badge with a broken nest
+8. badge with an oil drop
+9. badge with a train
+10. badge with a robot
+11. badge with a rocket
+12. gold star badge
+
+Leave generous empty magenta space around every object. Do not draw any text. Use a wide landscape canvas.</pre>
+  <button data-copy="s42">Copy prompt</button>
+</article></section><section data-tier="b"><h2>Branding art (not sliced, text allowed)</h2>
+<article class="card" data-id="B1">
+  <header>
+    <label class="done"><input type="checkbox" data-done="B1"> generated</label>
+    <h3>B1 - Game logo</h3><span class="meta">single image</span>
+  </header>
+  
+  <pre>Logo for the video game "CINDER AUTOMATA": bold, chunky industrial lettering forged from dark riveted metal with glowing ember-orange cracks, a small cog with a flame above the text, on a flat magenta (#FF00FF) background. Exactly the words "CINDER AUTOMATA", no other text.</pre>
+  <button data-copy="B1">Copy prompt</button>
+</article>
+<article class="card" data-id="B2">
+  <header>
+    <label class="done"><input type="checkbox" data-done="B2"> generated</label>
+    <h3>B2 - Title screen background</h3><span class="meta">single image</span>
+  </header>
+  
+  <pre>Wide 16:9 painted game title-screen background for "Cinder Automata": a burnt ash-covered alien world at dusk, a sprawling industrial factory of belts, smelters and chimneys glowing ember-orange in the middle distance, dark smoke, a crashed spaceship in the foreground, lonely engineer silhouette. Dramatic, cinematic, no text, no UI.</pre>
+  <button data-copy="B2">Copy prompt</button>
+</article>
+<article class="card" data-id="B3">
+  <header>
+    <label class="done"><input type="checkbox" data-done="B3"> generated</label>
+    <h3>B3 - Loading screen art</h3><span class="meta">single image</span>
+  </header>
+  
+  <pre>Wide 16:9 painted illustration: a close view of a factory belt line at night with glowing ore and molten smelters, sparks in the air, painterly game-art style, warm orange light against cold grey-blue shadows, space near the bottom kept fairly dark for a loading bar. No text.</pre>
+  <button data-copy="B3">Copy prompt</button>
+</article>
+<article class="card" data-id="B4">
+  <header>
+    <label class="done"><input type="checkbox" data-done="B4"> generated</label>
+    <h3>B4 - Key art / thumbnail</h3><span class="meta">single image</span>
+  </header>
+  
+  <pre>Square 1:1 key art for the game "Cinder Automata": a determined engineer in a hard hat standing in front of a huge glowing automated factory on a burnt alien world, rogue rusted robot creatures approaching from the smoke, dramatic rim lighting, painterly. Leave the upper third calm for a title. No text.</pre>
+  <button data-copy="B4">Copy prompt</button>
+</article></section>
+</main>
+<script>
+const KEY='cinder-prompt-pack-done';let done={};try{done=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const cards=[...document.querySelectorAll('.card')];
+function refresh(){let n=0;for(const c of cards){const d=!!done[c.dataset.id];c.classList.toggle('is-done',d);c.querySelector('[data-done]').checked=d;if(d)n++;
+ c.hidden=document.getElementById('hideDone').checked&&d}
+ document.getElementById('count').textContent=n+' / '+cards.length+' generated';document.getElementById('fill').style.width=(100*n/cards.length)+'%'}
+document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.done;if(id){done[id]=e.target.checked;try{localStorage.setItem(KEY,JSON.stringify(done))}catch(_){}}refresh()});
+document.getElementById('hideDone').addEventListener('change',refresh);
+document.addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.copy;if(!id)return;
+ const text=document.querySelector('[data-id="'+id+'"] pre').textContent;
+ try{await navigator.clipboard.writeText(text)}catch(_){const r=document.createRange();r.selectNodeContents(document.querySelector('[data-id="'+id+'"] pre'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy')}
+ e.target.textContent='Copied!';e.target.classList.add('ok');setTimeout(()=>{e.target.textContent='Copy prompt';e.target.classList.remove('ok')},1400)});
+refresh();
+</script></body></html>

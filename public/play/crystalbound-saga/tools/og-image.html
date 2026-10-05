@@ -1,0 +1,62 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<base href="../">
+<style>
+  html,body{ margin:0; width:1200px; height:630px; overflow:hidden; background:#0b0820; }
+  .og{ position:relative; width:1200px; height:630px; overflow:hidden; font-family:Nunito, sans-serif; color:#f6f0ff; }
+  .bg{ position:absolute; inset:0; background:url(assets/backdrops/aurelith.webp) center 40%/cover; filter:saturate(1.15); }
+  .shade{ position:absolute; inset:0; background:
+      linear-gradient(90deg, rgba(10,6,28,.96) 0%, rgba(10,6,28,.88) 38%, rgba(10,6,28,.35) 62%, rgba(10,6,28,.15) 100%),
+      radial-gradient(ellipse at 78% 45%, rgba(160,90,255,.35), transparent 60%),
+      linear-gradient(0deg, rgba(10,6,28,.85), transparent 30%); }
+  .frame{ position:absolute; inset:14px; border:2px solid rgba(255,210,122,.45); border-radius:22px; box-shadow:inset 0 0 40px rgba(255,210,122,.12); }
+  .left{ position:absolute; left:60px; top:58px; width:600px; }
+  .brandRow{ display:flex; align-items:center; gap:22px; }
+  .icon{ width:108px; height:108px; border-radius:26px; box-shadow:0 0 34px rgba(170,100,255,.7), 0 0 0 2px rgba(255,210,122,.5); }
+  h1{ margin:0; font-family:Cinzel, serif; font-weight:900; font-size:62px; line-height:.98; letter-spacing:1px;
+      background:linear-gradient(180deg,#fff6d8 0%,#ffd27a 45%,#c98a2c 100%); -webkit-background-clip:text; color:transparent;
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,.7)); }
+  .tag{ margin-top:18px; font-family:Cinzel, serif; font-weight:700; letter-spacing:.42em; font-size:19px; color:#cbb8ff; }
+  .pitch{ margin-top:20px; font-size:25px; font-weight:800; line-height:1.3; color:#fff; text-shadow:0 2px 8px #000; }
+  .pitch b{ color:#ffd27a; }
+  .tiles{ display:flex; gap:12px; margin-top:28px; }
+  .tiles img{ width:64px; height:64px; border-radius:12px; box-shadow:0 6px 14px rgba(0,0,0,.6); }
+  .tiles .sp{ box-shadow:0 0 18px rgba(255,210,122,.7), 0 6px 14px rgba(0,0,0,.6); }
+  .cta{ position:absolute; left:64px; bottom:46px; display:flex; align-items:center; gap:16px; }
+  .play{ padding:13px 30px; border-radius:16px; font-family:Cinzel, serif; font-weight:900; font-size:24px; color:#2a1a05;
+         background:linear-gradient(180deg,#ffe9b0,#e3a93f); box-shadow:0 5px 0 #8a5a14, 0 0 26px rgba(255,210,122,.5); }
+  .free{ font-size:19px; font-weight:800; color:#d9ccff; }
+  .cards{ position:absolute; right:22px; top:34px; width:500px; height:560px; }
+  .card{ position:absolute; width:176px; height:396px; border-radius:18px; overflow:hidden; border:3px solid #ffd27a;
+         box-shadow:0 18px 40px rgba(0,0,0,.75), 0 0 30px rgba(255,210,122,.25); background:#1a1240; }
+  .card img{ width:100%; height:100%; object-fit:cover; }
+  .c1{ left:20px; top:92px; transform:rotate(-9deg); }
+  .c2{ left:168px; top:48px; z-index:2; transform:rotate(0deg); width:190px; height:428px; }
+  .c3{ left:316px; top:92px; transform:rotate(9deg); }
+  .boss{ position:absolute; right:-30px; top:-40px; width:300px; height:620px; opacity:.38; filter:blur(1px) saturate(.8) hue-rotate(-10deg);
+         -webkit-mask-image:linear-gradient(90deg, transparent, #000 50%); }
+  .boss img{ width:100%; height:100%; object-fit:cover; }
+  .studio{ position:absolute; right:150px; bottom:30px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:#bdb2e6; letter-spacing:.2em; z-index:3; }
+  .studio img{ width:52px; }
+</style></head>
+<body><div class="og">
+  <div class="bg"></div><div class="shade"></div>
+  <div class="cards">
+    <div class="boss"><img src="assets/bosses/poseidon-full.jpg"></div>
+    <div class="card c1"><img src="assets/guardians/tide-full.jpg"></div>
+    <div class="card c3"><img src="assets/guardians/storm-full.jpg"></div>
+    <div class="card c2"><img src="assets/guardians/dawn-full.jpg"></div>
+  </div>
+  <div class="left">
+    <div class="brandRow"><img class="icon" src="assets/app/android-chrome-512x512.png"><h1>Crystalbound<br>Saga</h1></div>
+    <div class="tag">RESTORE THE HEARTSTONES</div>
+    <div class="pitch">A fantasy <b>match-3 RPG</b>.<br>Battle gods and monsters, forge your<br>Wardblade and raid the Rift.</div>
+    <div class="tiles">
+      <img src="assets/tiles/ember.webp"><img src="assets/tiles/tide.webp"><img src="assets/tiles/storm.webp"><img src="assets/tiles/loam.webp"><img src="assets/tiles/dawn.webp"><img class="sp" src="assets/tiles/icons/orb.webp">
+    </div>
+  </div>
+  <div class="cta"><div class="play">Play free</div><div class="free">In your browser · phone, tablet &amp; PC</div></div>
+  <div class="studio">A GAME BY <img src="assets/app/fuzenova-games.webp"></div>
+  <div class="frame"></div>
+</div></body></html>

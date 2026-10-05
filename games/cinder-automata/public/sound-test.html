@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound test - Cinder Automata</title>
+<style>
+  :root { color-scheme: dark; --bg: #0b0908; --panel: #1a1512; --line: rgba(255,255,255,.12); --text: #f0e8de; --dim: #a89c8e; --accent: #ff8a1f; --good: #6fd08a; --bad: #ff7a5c; --meh: #e0c84a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: rgba(11,9,8,.95); border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  header h1 { margin: 0; font-size: 18px; }
+  header label { color: var(--dim); font-size: 13px; display: flex; gap: 8px; align-items: center; }
+  button { font: inherit; cursor: pointer; color: var(--text); background: #2a211b; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; }
+  button:hover { border-color: var(--accent); }
+  button.on { background: rgba(255,138,31,.25); border-color: var(--accent); }
+  main { max-width: 980px; margin: 0 auto; padding: 8px 16px 60px; }
+  h2 { margin: 26px 0 4px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .sub { color: var(--dim); font-size: 13px; margin: 0 0 8px; }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .row.playing { border-color: var(--accent); }
+  .row.r-bad { border-left: 4px solid var(--bad); } .row.r-meh { border-left: 4px solid var(--meh); } .row.r-good { border-left: 4px solid var(--good); }
+  .name { font-weight: 700; } .name small { color: var(--dim); font-weight: 400; margin-left: 8px; }
+  .use { color: var(--dim); font-size: 13px; }
+  .ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; }
+  .rate button { padding: 4px 9px; font-size: 13px; }
+  .rate button.bad.on { background: rgba(255,122,92,.3); border-color: var(--bad); } .rate button.meh.on { background: rgba(224,200,74,.25); border-color: var(--meh); } .rate button.good.on { background: rgba(111,208,138,.25); border-color: var(--good); }
+  input[type=text] { grid-column: 1 / -1; background: #120e0b; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 13px; }
+  .bar { grid-column: 1 / -1; height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; } .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 5px; background: rgba(255,255,255,.1); margin-left: 6px; }
+  #out { width: 100%; height: 150px; background: #120e0b; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px; font: 13px ui-monospace, Consolas, monospace; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sound test</h1>
+  <label>Volume <input id="vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+  <button id="stop">Stop all</button>
+  <button id="report">Show my ratings</button>
+  <span class="sub" style="margin:0">Press play, then rate: Bad / OK / Good. Ratings and notes are saved in this browser.</span>
+</header>
+<main>
+  <div id="app">Loading...</div>
+  <h2>Your ratings</h2>
+  <p class="sub">Press "Show my ratings" and paste this into the chat so I can redo the bad ones.</p>
+  <textarea id="out" readonly placeholder="Ratings appear here"></textarea>
+</main>
+<script>
+// Where each sound is used in the game (shown so you know what it should feel like)
+const USE = {
+  'ui-click': 'Every button press.', 'ui-open': 'Opening the menu.', 'ui-denied': 'A placement that is refused (not enough plates, or it will not fit).',
+  'ui-star': 'A commander earns a star, and a commander unlocks.', 'ui-level-complete': 'Backup for the victory music.', 'ui-defeat': 'Backup for the defeat music.',
+  'ui-fight-start': 'The fight begins (plays as the build timer ends).', 'ui-build-start': 'The next build phase begins.',
+  'place-building': 'Placing a building (4 takes, one at random each time).', 'place-belt': 'Placing a belt or inserter (4 takes, quiet, limited so a dragged line does not machine-gun).', 'remove-building': 'Removing a building (not belts or inserters).', rotate: 'Pressing R to rotate (4 takes).', pickup: 'Pressing V to lift a building.', 'drop-building': 'Putting a moved building down.',
+  'loop-drill': 'Quiet hum while drills work on screen (fights only). Loops.', 'loop-smelter': 'Smelters with ore in them, on screen. Loops.', 'loop-belt': 'Belts carrying items. Loops.', 'loop-assembler': 'Assemblers working. Loops.', 'loop-generator': 'Ember generators with fuel. Loops.', 'loop-coil-idle': 'Powered Storm coils. Loops.', 'loop-ambience-ash': 'Wind over the wasteland between fights. Loops.', 'loop-ambience-fight': 'Uneasy battlefield bed during fights. Loops.',
+  menu: 'Title screen and new-game screen. Loops.', build: 'Building and general play (the calm track). Loops.', 'fight-1': 'Every fight on levels 1 to 9, and used for higher levels until their own fight tracks exist. Loops.', boss: 'Boss levels: fades in from the battle music once the boss is in sight. Loops.',
+  victory: 'Level won. Plays once.', defeat: 'Core destroyed. Plays once.',
+};
+const RK = 'cinder-automata.soundtest.v1';
+let ratings = {};
+try { ratings = JSON.parse(localStorage.getItem(RK) || '{}'); } catch (e) {}
+const save = () => { try { localStorage.setItem(RK, JSON.stringify(ratings)); } catch (e) {} };
+const audios = [];
+const vol = document.getElementById('vol');
+vol.addEventListener('input', () => audios.forEach((a) => { a.volume = +vol.value; }));
+document.getElementById('stop').onclick = () => audios.forEach((a) => { a.pause(); a.currentTime = 0; a._row && a._row.classList.remove('playing'); });
+
+function row(item, kind) {
+  const key = kind + '/' + item.name;
+  const r = ratings[key] || {};
+  const el = document.createElement('div');
+  el.className = 'row' + (r.v ? ' r-' + r.v : '');
+  const music = kind === 'music' || item.name.startsWith('loop-');
+  el.innerHTML = `
+    <div><span class="name">${item.name}<small>${item.seconds}s, ${item.kb} KB</small>${kind === 'alt' ? '<span class="tag">alternate</span>' : ''}</span>
+      <div class="use">${USE[item.name.replace(/-(b|c|short)$/, '')] ? USE[item.name.replace(/-(b|c|short)$/, '')] : ''}</div></div>
+    <div class="ctl">
+      <button class="play">Play</button>
+      ${music ? '<button class="loop">Loop</button><button class="seam">Hear the loop join</button>' : ''}
+      ${item.original ? '<button class="orig">Original</button>' : ''}
+      <span class="rate"><button class="bad">Bad</button> <button class="meh">OK</button> <button class="good">Good</button></span>
+    </div>
+    <div class="bar"><i></i></div>
+    <input type="text" placeholder="What is wrong with it? (for example: too harsh, too long, clicks at the end)" value="${(r.n || '').replace(/"/g, '&quot;')}">`;
+  const make = (src) => { const a = new Audio(src); a.preload = 'none'; a.volume = +vol.value; a._row = el; audios.push(a); return a; };
+  const main = make(item.file), orig = item.original ? make(item.original) : null;
+  const bar = el.querySelector('.bar i');
+  const stopOthers = (keep) => audios.forEach((a) => { if (a !== keep) { a.pause(); a.currentTime = 0; a._row.classList.remove('playing'); } });
+  const toggle = (a, btn) => {
+    if (!a.paused) { a.pause(); a.currentTime = 0; el.classList.remove('playing'); return; }
+    stopOthers(a); a.currentTime = 0; a.play(); el.classList.add('playing');
+  };
+  for (const a of [main, orig].filter(Boolean)) {
+    a.addEventListener('timeupdate', () => { bar.style.width = (a.currentTime / (a.duration || 1) * 100) + '%'; });
+    a.addEventListener('ended', () => { el.classList.remove('playing'); bar.style.width = '0'; });
+  }
+  if (item.name.startsWith('loop-')) main.loop = true;
+  el.querySelector('.play').onclick = () => toggle(main);
+  if (orig) el.querySelector('.orig').onclick = () => toggle(orig);
+  if (music) {
+    el.querySelector('.loop').onclick = (e) => { main.loop = !main.loop; e.target.classList.toggle('on', main.loop); };
+    el.querySelector('.seam').onclick = () => { stopOthers(main); main.loop = true; main.currentTime = Math.max(0, main.duration - 6); main.play(); el.classList.add('playing'); };
+  }
+  const setV = (v) => { ratings[key] = { ...(ratings[key] || {}), v }; save(); el.className = 'row r-' + v + (el.classList.contains('playing') ? ' playing' : ''); paint(); };
+  const paint = () => ['bad', 'meh', 'good'].forEach((b) => el.querySelector('.rate .' + b).classList.toggle('on', (ratings[key] || {}).v === b));
+  ['bad', 'meh', 'good'].forEach((b) => { el.querySelector('.rate .' + b).onclick = () => setV(b); });
+  el.querySelector('input').oninput = (e) => { ratings[key] = { ...(ratings[key] || {}), n: e.target.value }; save(); };
+  paint();
+  return el;
+}
+
+fetch('audio/manifest.json').then((r) => r.json()).then((m) => {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  const section = (title, sub, items, kind) => {
+    if (!items.length) return;
+    const h = document.createElement('h2'); h.textContent = title; app.append(h);
+    const p = document.createElement('p'); p.className = 'sub'; p.textContent = sub; app.append(p);
+    items.forEach((i) => app.append(row(i, kind)));
+  };
+  section('Sound effects', 'These are the ones the game plays now. "Original" is the untouched download, for comparing.', m.sfx, 'sfx');
+  section('Alternates', 'Other takes and shorter cuts that are not in the game. Tell me if you prefer one.', m.alt, 'alt');
+  section('Music', 'Use "Hear the loop join" to jump to 6 seconds before the end and listen to how it comes back round.', m.music, 'music');
+}).catch((e) => { document.getElementById('app').textContent = 'Could not load audio/manifest.json (' + e + '). Run: node tools/build-sound-manifest.mjs'; });
+
+document.getElementById('report').onclick = () => {
+  const lines = Object.entries(ratings).filter(([, r]) => r.v || r.n).map(([k, r]) => `${k}: ${({ bad: 'BAD', meh: 'OK', good: 'GOOD' })[r.v] || '-'}${r.n ? ' - ' + r.n : ''}`);
+  document.getElementById('out').value = lines.join('\n') || 'Nothing rated yet.';
+};
+</script>
+</body>
+</html>
