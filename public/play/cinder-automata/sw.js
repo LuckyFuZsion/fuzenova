@@ -1,7 +1,7 @@
 /* Cinder Automata service worker. Generated into the build by tools/build-pwa.mjs: edit the template, not the copy. */
-const VERSION = '33bb3d03a8';
+const VERSION = '38bc325013';
 const CACHE = `cinder-automata-${VERSION}`;
-const SHELL = ["./","assets/index-C14ulU3u.js","assets/index-DRo0qM8p.css","fuzenova-intro/assets/core-glow.webp","fuzenova-intro/assets/emblem.webp","fuzenova-intro/assets/petal-ember.webp","fuzenova-intro/assets/petal-loam.webp","fuzenova-intro/assets/petal-storm.webp","fuzenova-intro/assets/petal-tide.webp","fuzenova-intro/assets/sting.mp3","fuzenova-intro/assets/word-fuzenova.webp","fuzenova-intro/assets/word-games.webp","fuzenova-intro/fuzenova-intro.js","icons/apple-touch-icon.png","icons/favicon.png","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","index.html","manifest.webmanifest","sprites/manifest.json"];
+const SHELL = ["./","assets/index-B97f1Gk8.css","assets/index-Bl5n2V5d.js","fuzenova-intro/assets/core-glow.webp","fuzenova-intro/assets/emblem.webp","fuzenova-intro/assets/petal-ember.webp","fuzenova-intro/assets/petal-loam.webp","fuzenova-intro/assets/petal-storm.webp","fuzenova-intro/assets/petal-tide.webp","fuzenova-intro/assets/sting.mp3","fuzenova-intro/assets/word-fuzenova.webp","fuzenova-intro/assets/word-games.webp","fuzenova-intro/fuzenova-intro.js","icons/apple-touch-icon.png","icons/favicon.png","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","index.html","manifest.webmanifest","sprites/manifest.json"];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
