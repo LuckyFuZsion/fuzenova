@@ -1,4 +1,4 @@
-import { ArrowRight, Cloud, Laptop, Smartphone } from 'lucide-react'
+import { ArrowRight, Cloud } from 'lucide-react'
 import Link from 'next/link'
 import { Divider } from '@/components/site/divider'
 import { ContactBanner } from '@/components/site/cta'
@@ -98,28 +98,68 @@ export default function HomePage() {
 
 function SyncDiagram() {
   return (
-    <figure className="glass-card relative flex flex-col items-center gap-8 p-8 md:p-12" aria-label="Saves sync between your phone, laptop and the cloud">
-      <div className="flex size-24 items-center justify-center rounded-full border border-dawn/40 bg-dawn/10 text-dawn shadow-[0_0_50px_rgba(255,226,122,0.25)]">
-        <Cloud className="size-10" aria-hidden="true" />
-      </div>
-      <div className="flex w-full max-w-sm justify-between" aria-hidden="true">
-        <span className="h-12 w-px origin-bottom rotate-[35deg] bg-gradient-to-t from-tide to-dawn" />
-        <span className="h-12 w-px origin-bottom -rotate-[35deg] bg-gradient-to-t from-storm to-dawn" />
-      </div>
-      <div className="flex w-full max-w-sm justify-between">
-        <Device icon={<Smartphone className="size-7" aria-hidden="true" />} label="Phone" colour="text-tide border-tide/40" />
-        <Device icon={<Laptop className="size-7" aria-hidden="true" />} label="Laptop" colour="text-storm border-storm/40" />
-      </div>
-      <figcaption className="text-center text-sm text-muted">Progress saved on each device and synced through your account.</figcaption>
-    </figure>
-  )
-}
+    <figure className="glass-card relative overflow-hidden p-6 md:p-8" aria-label="Saves sync between your phone, laptop and the cloud">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-2/3 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(255,226,122,0.16),transparent)]" aria-hidden="true" />
+      <div className="relative mx-auto aspect-[520/470] w-full max-w-md">
+        <svg viewBox="0 0 520 470" className="absolute inset-0 size-full" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="sync-l" x1="260" y1="138" x2="105" y2="212" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FFE27A" />
+              <stop offset="1" stopColor="#2EC8FF" />
+            </linearGradient>
+            <linearGradient id="sync-r" x1="260" y1="138" x2="415" y2="296" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FFE27A" />
+              <stop offset="1" stopColor="#A45CFF" />
+            </linearGradient>
+          </defs>
+          <path id="sync-path-l" d="M260 138 C260 190 105 150 105 212" stroke="url(#sync-l)" strokeWidth="3" strokeDasharray="1 8" strokeLinecap="round" />
+          <path id="sync-path-r" d="M260 138 C260 240 415 190 415 296" stroke="url(#sync-r)" strokeWidth="3" strokeDasharray="1 8" strokeLinecap="round" />
+          <g className="motion-reduce:hidden">
+            <circle r="5" fill="#FFE27A">
+              <animateMotion dur="3.2s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#sync-path-l" /></animateMotion>
+            </circle>
+            <circle r="5" fill="#FFE27A">
+              <animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"><mpath href="#sync-path-l" /></animateMotion>
+            </circle>
+            <circle r="5" fill="#FFE27A">
+              <animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#sync-path-r" /></animateMotion>
+            </circle>
+            <circle r="5" fill="#FFE27A">
+              <animateMotion dur="3.2s" begin="2.4s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"><mpath href="#sync-path-r" /></animateMotion>
+            </circle>
+          </g>
+        </svg>
 
-function Device({ icon, label, colour }: { icon: React.ReactNode; label: string; colour: string }) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className={`flex size-16 items-center justify-center rounded-2xl border bg-void ${colour}`}>{icon}</div>
-      <span className="text-sm font-bold">{label}</span>
-    </div>
+        {/* Cloud / account */}
+        <div className="absolute top-0 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:gap-2">
+          <div className="flex size-14 items-center justify-center rounded-full border border-dawn/50 sm:size-20 bg-void text-dawn shadow-[0_0_50px_rgba(255,226,122,0.3)]">
+            <Cloud className="size-6 sm:size-9" aria-hidden="true" />
+          </div>
+          <span className="text-[10px] font-bold tracking-widest whitespace-nowrap text-dawn uppercase sm:text-xs">FuzeNova account</span>
+        </div>
+
+        {/* Phone showing Crystalbound */}
+        <div className="absolute bottom-0 left-[20.2%] flex w-[26%] -translate-x-1/2 flex-col items-center gap-2">
+          <div className="aspect-[9/17] w-full overflow-hidden rounded-[18px] border-2 border-tide/60 bg-black p-[3px] shadow-[0_0_30px_rgba(46,200,255,0.25)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/play/crystalbound-saga/assets/story/ch2-intro.webp" alt="" className="size-full rounded-[14px] object-cover" />
+          </div>
+          <span className="text-sm font-bold">Phone</span>
+        </div>
+
+        {/* Laptop showing Cinder Automata */}
+        <div className="absolute bottom-0 left-[79.8%] flex w-[40%] -translate-x-1/2 flex-col items-center gap-2">
+          <div className="w-full">
+            <div className="aspect-[16/10] w-full overflow-hidden rounded-t-lg border-2 border-b-0 border-storm/60 bg-black p-[3px] shadow-[0_0_30px_rgba(164,92,255,0.25)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/games/cinder/shot-3.webp" alt="" className="size-full rounded-t-[5px] object-cover" />
+            </div>
+            <div className="mx-[-6%] h-2 rounded-b-xl border border-storm/40 bg-gradient-to-b from-[#2a2f55] to-[#14183a]" />
+          </div>
+          <span className="text-sm font-bold">Laptop</span>
+        </div>
+      </div>
+      <figcaption className="relative mt-6 text-center text-sm text-muted">Progress saved on each device and synced through your account.</figcaption>
+    </figure>
   )
 }
