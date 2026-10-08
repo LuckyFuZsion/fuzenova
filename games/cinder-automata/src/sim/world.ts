@@ -1,7 +1,8 @@
 // Cinder Automata - simulation core. No rendering or DOM in here so it can be tested headless.
 import { DEFAULT_MODS, type Mods } from './commanders';
 import { researchFx, type ResearchFx } from './research';
-import { ROBOTS, type RobotType, type Soldier } from './robots';
+import { BASE_VARIANT, VARIANTS, type CoilVariant, type TurretVariant } from './turretdata';
+import { FAB_KINDS, FAB_ROBOTS, ROBOTS, type FabKind, type RobotType, type Soldier } from './robots';
 import { ENEMIES, type EnemyKind } from './enemies';
 
 import { plotIdAt, plotsBounds } from './plots';
@@ -32,6 +33,14 @@ interface Base {
 /** `j` is a fixed sideways wobble (-1..1) so a full belt looks like a heap of ore, not a single-file line; it travels with the item */
 export interface BeltItem { type: ItemId; pos: number; j?: number }
 export interface Belt extends Base { kind: 'belt'; items: BeltItem[] }
+/**
+ * An underground belt piece. Pieces come in pairs facing the same way: an entrance takes items from a belt, and they pass under whatever lies
+ * between (walls, machines, rocks) to an exit up to TUNNEL_MAX_GAP tiles further on, which hands them to whatever is in front of it.
+ * Which piece is which is decided when it is placed: one that has a free entrance in line behind it (within range) is that entrance's exit.
+ */
+export interface Tunnel extends Base { kind: 'tunnel'; role: 'in' | 'out'; items: BeltItem[] }
+/** How many tiles of anything can lie between an entrance and its exit. */
+export const TUNNEL_MAX_GAP = 4;
 export interface Miner extends Base { kind: 'miner'; progress: number; pending: ItemId | null; cursor: number }
 export interface Inserter extends Base {
   kind: 'inserter'; state: 'idle' | 'toDrop' | 'back'; t: number; held: ItemId | null;
@@ -44,7 +53,7 @@ export interface Furnace extends Base {
   kind: 'furnace'; inType: ItemId | null; inCount: number; progress: number; outType: ItemId | null; outCount: number;
 }
 /** Shoots enemies. Pulls ammo from an adjacent belt (or an inserter) into a small stockpile. */
-export interface Turret extends Base { kind: 'turret'; ammo: number; cooldown: number; pull: number; aim: number; dmg: number; /** ammo capacity; older saves have none and use the default */ maxAmmo?: number; /** gun, scatter or sniper (see turrets.ts); missing = the plain gun */ variant?: 'gun' | 'scatter' | 'sniper' }
+export interface Turret extends Base { kind: 'turret' | 'flamer'; ammo: number; cooldown: number; pull: number; aim: number; dmg: number; /** ammo capacity; older saves have none and use the default */ maxAmmo?: number; /** which type it has been upgraded to (see turretdata.ts); missing = the base type of its building */ variant?: TurretVariant }
 /**
  * Makes one recipe at a time from items delivered by inserters (or a drill/belt end), and holds the result for an
  * inserter to collect. Click it (no building selected) to switch recipe.
@@ -61,7 +70,9 @@ export interface Core extends Base {
 /** A cheap blocker that soaks up enemy attention so turrets can do their work. */
 export interface Wall extends Base { kind: 'wall' }
 /** Turns iron plates into robot soldiers (only while a fight is on). Click it in-game to change what it builds. */
-export interface RobotFab extends Base { kind: 'robotfab'; type: RobotType; stock: number; progress: number; pull: number }
+/** A robot-making building (see FAB_ROBOTS): the Drone Workshop ('robotfab'), Gunship Hangar, Walker Foundry or Heavy Works. `inv` holds the plates it has taken in. */
+export interface RobotFab extends Base { kind: FabKind; type: RobotType; inv: Partial<Record<ItemId, number>>; progress: number; pull: number }
+export const isFab = (e: { kind: string }): e is RobotFab => (FAB_KINDS as string[]).includes(e.kind);
 /** Carries power. Anything within its supply area, and every pole within reach, joins one network. */
 export interface Pole extends Base { kind: 'pole' }
 /** Burns coal, charcoal or wood (delivered by inserter or belt) while a fight is on, and feeds its power network. */
@@ -69,7 +80,7 @@ export interface Generator extends Base { kind: 'generator'; fuelSecs: number }
 /** A scrap bin: destroys whatever an inserter (or belt) gives it. Put a filtered inserter in front of it to clear just one kind of item. */
 export interface ScrapBin extends Base { kind: 'scrapbin'; burned: number }
 /** The Storm Coil: needs no ammo, but power. Its lightning jumps from one enemy to the next. */
-export interface Coil extends Base { kind: 'coil'; cooldown: number; use: number; flash: number; /** stored energy, 0 to COIL_CHARGE_MAX; each bolt spends some */ charge: number }
+export interface Coil extends Base { kind: 'coil'; /** missing = the plain Storm coil */ variant?: CoilVariant; cooldown: number; use: number; flash: number; /** stored energy, 0 to COIL_CHARGE_MAX; each bolt spends some */ charge: number }
 /**
  * A crossover: two belts can cross through one tile. Items go straight on in the direction they came in, one lane
  * for each of the four directions, so a line running east-west and another running north-south never mix.
@@ -81,7 +92,7 @@ export interface Junction extends Base { kind: 'junction'; lanes: BeltItem[][] }
  * front it is a merger; with only one belt behind it is a splitter.
  */
 export interface Splitter extends Base { kind: 'splitter'; items: BeltItem[]; rr: 0 | 1 }
-export type Entity = Junction | Splitter | Belt | Miner | Inserter | Furnace | Turret | Core | RobotFab | Wall | Assembler | Pole | Generator | Coil | ScrapBin;
+export type Entity = Junction | Splitter | Belt | Miner | Inserter | Furnace | Turret | Core | RobotFab | Wall | Assembler | Pole | Generator | Coil | ScrapBin | Tunnel;
 export type Kind = Entity['kind'];
 
 export const KINDS: Record<Kind, { w: number; h: number; name: string }> = {
@@ -91,7 +102,10 @@ export const KINDS: Record<Kind, { w: number; h: number; name: string }> = {
   furnace: { w: 2, h: 2, name: 'Smelter' },
   turret: { w: 2, h: 2, name: 'Gun turret' },
   core: { w: 3, h: 3, name: 'Cinder Core' },
-  robotfab: { w: 3, h: 3, name: 'Robot fabricator' },
+  robotfab: { w: 3, h: 3, name: 'Drone workshop' },
+  hangar: { w: 3, h: 3, name: 'Gunship hangar' },
+  foundry: { w: 3, h: 3, name: 'Walker foundry' },
+  heavyworks: { w: 3, h: 3, name: 'Heavy works' },
   wall: { w: 1, h: 1, name: 'Wall' },
   assembler: { w: 3, h: 3, name: 'Assembler' },
   pole: { w: 1, h: 1, name: 'Power pole' },
@@ -100,6 +114,8 @@ export const KINDS: Record<Kind, { w: number; h: number; name: string }> = {
   junction: { w: 1, h: 1, name: 'Crossover' },
   splitter: { w: 1, h: 2, name: 'Splitter / merger' },
   scrapbin: { w: 2, h: 2, name: 'Scrap bin' },
+  flamer: { w: 2, h: 2, name: 'Flamer' },
+  tunnel: { w: 1, h: 1, name: 'Tunnel' },
 };
 
 /** The tiles a building covers when facing this way (a splitter is long across its flow, so turning it swaps width and height). */
@@ -112,8 +128,8 @@ export function footprint(kind: Kind, dir: Dir): { w: number; h: number } {
 
 /** Structure health. Enemies attack turrets and walls first, so those are the toughest. */
 export const STRUCTURE_HP: Record<Kind, number> = {
-  belt: 40, inserter: 40, miner: 140, furnace: 140, turret: 280, core: 600, robotfab: 240, wall: 320, assembler: 160,
-  pole: 140, generator: 220, coil: 260, junction: 40, splitter: 60, scrapbin: 120,
+  belt: 40, inserter: 40, miner: 140, furnace: 140, turret: 280, core: 600, robotfab: 240, hangar: 240, foundry: 240, heavyworks: 320, wall: 320, assembler: 160,
+  pole: 140, generator: 220, coil: 260, junction: 40, splitter: 60, scrapbin: 120, tunnel: 80, flamer: 260,
 };
 
 /** Largest fuel reserve a generator will hold, in seconds of running time. */
@@ -130,6 +146,9 @@ export const CORE_HP = 600;
 export interface Enemy {
   id: number; x: number; y: number; hp: number; maxHp: number; speed: number; dmg: number; born: number; kind?: EnemyKind;
   /** boss ability timer, seconds */ abil?: number;
+  /** frozen in place for this many more seconds (a Stun coil) */ stun?: number;
+  /** on fire: this much damage a second for this many more seconds */ burn?: { dps: number; t: number };
+  /** slowed: walks this much slower (0-1) for this many more seconds */ slow?: { f: number; t: number };
   /** ground enemies: the route round obstacles, and when it was made */
   path?: { x: number; y: number }[]; pathT?: number; pathVer?: number;
   /** stragglers at the end of a fight get hurried along (see Run.hurryStragglers) */
@@ -164,15 +183,16 @@ export function createEntity(kind: Kind, id: number, x: number, y: number, dir: 
     case 'miner': return { ...base, kind, progress: 0, pending: null, cursor: 0 };
     case 'inserter': return { ...base, kind, state: 'idle', t: 0, held: null, locked: false };
     case 'furnace': return { ...base, kind, inType: null, inCount: 0, progress: 0, outType: null, outCount: 0 };
-    case 'turret': return { ...base, kind, ammo: 0, cooldown: 0, pull: 0, aim: 0, dmg: DEFAULT_TURRET_DAMAGE };
+    case 'turret': case 'flamer': return { ...base, kind, ammo: 0, cooldown: 0, pull: 0, aim: 0, dmg: DEFAULT_TURRET_DAMAGE };
     case 'assembler': return { ...base, kind, recipe: 'gunpowder', stock: {}, out: 0, progress: 0 };
     case 'pole': return { ...base, kind };
     case 'generator': return { ...base, kind, fuelSecs: 0 };
     case 'scrapbin': return { ...base, kind, burned: 0 };
+    case 'tunnel': return { ...base, kind, role: 'in', items: [] };
     case 'coil': return { ...base, kind, cooldown: 0, use: 0, flash: 0, charge: 0 };
     case 'core': return { ...base, kind, stock: {} };
     case 'wall': return { ...base, kind };
-    case 'robotfab': return { ...base, kind, type: 'scout', stock: 0, progress: 0, pull: 0 };
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': return { ...base, kind, type: FAB_ROBOTS[kind][0], inv: {}, progress: 0, pull: 0 };
   }
 }
 
@@ -223,9 +243,10 @@ export function accepts(dst: Entity, item: ItemId, pos = 0): boolean {
     case 'belt': return dst.items.every((i) => Math.abs(i.pos - pos) >= ITEM_SPACING - 1e-6);
     case 'core': return CORE_ITEMS.includes(item); // only what can be spent: plates and science packs
     case 'scrapbin': return true; // takes anything at all, and destroys it
+    case 'tunnel': return dst.role === 'in' && dst.items.every((i) => Math.abs(i.pos - pos) >= ITEM_SPACING - 1e-6); // only an entrance takes things in
     case 'generator': { const f = FUEL[item]; return !!f && dst.fuelSecs + f <= GENERATOR_MAX_FUEL; }
-    case 'turret': { const a = AMMO[item]; return !!a && dst.ammo + a.shots <= (dst.maxAmmo ?? TURRET_MAX_AMMO); }
-    case 'robotfab': return item === 'iron-plate' && dst.stock < ROBOTS[dst.type].cost * 2;
+    case 'turret': case 'flamer': { const a = AMMO[item]; return !!a && VARIANTS[dst.variant ?? BASE_VARIANT[dst.kind]].ammo.includes(item) && dst.ammo + a.shots <= (dst.maxAmmo ?? TURRET_MAX_AMMO); } // only what this type fires
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': { const need = ROBOTS[dst.type].cost[item] ?? 0; return need > 0 && (dst.inv[item] ?? 0) < need * 2; } // only the plates its current robot needs, and room for two robots' worth
     case 'assembler': {
       const need = RECIPES[dst.recipe]?.inputs[item];
       return !!need && (dst.stock[item] ?? 0) < need * ASSEMBLER_BUFFER;
@@ -248,9 +269,13 @@ export function insert(dst: Entity, item: ItemId, pos = 0, j?: number): void {
     case 'core': dst.stock[item] = (dst.stock[item] ?? 0) + 1; break;
     case 'generator': dst.fuelSecs += FUEL[item] ?? 0; break;
     case 'scrapbin': dst.burned++; break;
+    case 'tunnel':
+      dst.items.push({ type: item, pos, j: j ?? Math.random() * 2 - 1 });
+      dst.items.sort((a, b) => b.pos - a.pos);
+      break;
     case 'furnace': dst.inType = item; dst.inCount++; break;
-    case 'turret': { const a = AMMO[item]!; dst.ammo += a.shots; dst.dmg = a.damage; break; }
-    case 'robotfab': dst.stock++; break;
+    case 'turret': case 'flamer': { const a = AMMO[item]!; dst.ammo += a.shots; dst.dmg = a.damage; break; }
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': dst.inv[item] = (dst.inv[item] ?? 0) + 1; break;
     case 'assembler': dst.stock[item] = (dst.stock[item] ?? 0) + 1; break;
   }
 }
@@ -258,6 +283,7 @@ export function insert(dst: Entity, item: ItemId, pos = 0, j?: number): void {
 function findTakeable(src: Entity, pred: (i: ItemId) => boolean): ItemId | null {
   switch (src.kind) {
     case 'belt': for (const it of src.items) if (pred(it.type)) return it.type; return null;
+    case 'tunnel': for (const it of src.items) if (it.pos >= 0 && pred(it.type)) return it.type; return null; // not what is still underground
     case 'furnace': return src.outCount > 0 && src.outType && pred(src.outType) ? src.outType : null;
     case 'assembler': { const o = RECIPES[src.recipe]?.output; return src.out > 0 && o && pred(o) ? o : null; }
     default: return null;
@@ -266,8 +292,9 @@ function findTakeable(src: Entity, pred: (i: ItemId) => boolean): ItemId | null 
 
 function take(src: Entity, item: ItemId): void {
   switch (src.kind) {
+    case 'tunnel':
     case 'belt': {
-      const i = src.items.findIndex((it) => it.type === item);
+      const i = src.items.findIndex((it) => it.type === item && it.pos >= 0);
       if (i >= 0) src.items.splice(i, 1);
       break;
     }
@@ -317,6 +344,8 @@ export class World {
   seed = 1337;
   /** heaps of rubble left where a building was destroyed (drawing only; each lasts about 45 seconds of game time) */
   rubble: { x: number; y: number; size: number; pick: number; t0: number }[] = [];
+  /** the Shield coils on the map (rebuilt every step by combat) */
+  shields: Coil[] = [];
   /** where things have been hurt lately (a building, the core or a robot), for the minimap's live "attack here" glow; each entry fades in about 1.5 seconds */
   hurt: { x: number; y: number; age: number }[] = [];
   markHurt(x: number, y: number): void {
@@ -328,6 +357,8 @@ export class World {
   cue(name: string): void { if (this.sfx.length < 80) this.sfx.push(name); }
   /** this fight's omen effects on the player's side: kill pay bonus, and how far turrets see (1 = normal) */
   bounty = 0;
+  /** builds up with each shot under the Concussive rounds talent; a stun lands each time it reaches 1 */
+  stunTally = 0;
   fog = 1;
   /** The part of the map in play. It starts small and grows with the level; outside it is unexplored and unbuildable. */
   arena = { x0: 0, y0: 0, x1: 0, y1: 0 };
@@ -436,6 +467,11 @@ export class World {
         for (const k in inv) lostChests[k as ItemId] = (lostChests[k as ItemId] ?? 0) + (inv[k as ItemId] ?? 0);
         continue;
       }
+      const old = e as unknown as { kind: string; stock?: unknown; inv?: unknown; type?: RobotType };
+      if (isFab(e) && typeof old.stock === 'number') { e.inv = { 'iron-plate': old.stock }; delete old.stock; } // a fabricator from before the robot chain: its iron plates carry over
+      if (e.kind === 'assembler' && (e.recipe as string) === 'bullet-casing') e.recipe = 'bullet'; // the casing recipe was folded into the bullet
+      if (isFab(e) && !e.inv) e.inv = {};
+      if (isFab(e) && !FAB_ROBOTS[e.kind].includes(e.type)) e.type = FAB_ROBOTS[e.kind][0]; // it used to make any robot; it is now the Drone Workshop
       this.entities.set(e.id, e);
       for (let dy = 0; dy < e.h; dy++) for (let dx = 0; dx < e.w; dx++) this.occ[(e.y + dy) * this.w + e.x + dx] = e.id;
       if (e.kind === 'core') this.core = e;
@@ -491,8 +527,10 @@ export class World {
     }
     if (!this.canPlace(kind, x, y, dir)) return null;
     const e = createEntity(kind, this.nextId++, x, y, dir);
-    if (e.kind === 'turret' || e.kind === 'wall') { e.maxHp = Math.round(e.maxHp * this.mods.defenceHp * this.rfx.defenceHp); e.hp = e.maxHp; }
-    if (e.kind === 'turret') e.maxAmmo = Math.round(TURRET_MAX_AMMO * this.mods.turretAmmo);
+    if (e.kind === 'tunnel') e.role = this.tunnelRoleFor(x, y, dir);
+    if (e.kind === 'turret' || e.kind === 'flamer' || e.kind === 'wall') { e.maxHp = Math.round(e.maxHp * this.mods.defenceHp * this.rfx.defenceHp); e.hp = e.maxHp; }
+    if (e.kind === 'core') { e.maxHp = Math.round(e.maxHp * this.mods.coreHp); e.hp = e.maxHp; }
+    if (e.kind === 'turret' || e.kind === 'flamer') e.maxAmmo = Math.round(TURRET_MAX_AMMO * this.mods.turretAmmo * (e.kind === 'flamer' ? 3 : 1)); // fire burns fuel fast: it holds more
     for (let dy = 0; dy < e.h; dy++) for (let dx = 0; dx < e.w; dx++) this.occ[(y + dy) * this.w + x + dx] = e.id;
     this.entities.set(e.id, e);
     this.layoutVersion++;
@@ -519,15 +557,16 @@ export class World {
    */
   emptyContents(e: Entity): void {
     switch (e.kind) {
-      case 'turret': e.ammo = 0; e.cooldown = 0; e.pull = 0; break;
+      case 'turret': case 'flamer': e.ammo = 0; e.cooldown = 0; e.pull = 0; break;
       case 'furnace': e.inType = null; e.inCount = 0; e.outType = null; e.outCount = 0; e.progress = 0; break;
       case 'assembler': e.stock = {}; e.out = 0; e.progress = 0; break;
-      case 'robotfab': e.stock = 0; e.progress = 0; e.pull = 0; break;
+      case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': e.inv = {}; e.progress = 0; e.pull = 0; break;
       case 'generator': e.fuelSecs = 0; break;
       case 'coil': e.charge = 0; e.cooldown = 0; break;
       case 'miner': e.pending = null; e.progress = 0; break;
       case 'inserter': e.held = null; e.state = 'idle'; e.t = 0; break;
       case 'belt': e.items = []; break;
+      case 'tunnel': e.items = []; break;
       default: break;
     }
   }
@@ -563,6 +602,7 @@ export class World {
         case 'generator': e.fuelSecs = Math.max(0, e.fuelSecs - dt); break; // burning fuel is what powers the network
         case 'coil': e.flash = Math.max(0, e.flash - dt); break;
         case 'belt': this.stepBelt(e, dt); break;
+        case 'tunnel': this.stepTunnel(e, dt); break;
         case 'junction': this.stepJunction(e, dt); break;
         case 'splitter': this.stepSplitter(e, dt); break;
       }
@@ -671,6 +711,10 @@ export class World {
       case 'belt':
         if (next.dir !== opposite(dir) && accepts(next, item, 0)) { insert(next, item, 0, j); return true; }
         return false;
+      case 'tunnel':
+        if (next.role !== 'in' || next.dir === opposite(dir) || !roomAtStart(next.items)) return false; // an entrance, from behind or the sides
+        next.items.push({ type: item, pos: 0, j }); next.items.sort((a, b) => b.pos - a.pos);
+        return true;
       case 'junction': {
         const lane = next.lanes[dir];
         if (!roomAtStart(lane)) return false;
@@ -719,6 +763,53 @@ export class World {
     }
   }
 
+  /** The exit an entrance is joined to, and how many tiles away it is; undefined if none is in range in line with it. Cached until the layout changes. */
+  tunnelLink(t: Tunnel): { exit: Tunnel; k: number } | undefined {
+    if (this.linkVer !== this.layoutVersion) { this.linkVer = this.layoutVersion; this.links.clear(); }
+    if (this.links.has(t.id)) return this.links.get(t.id) ?? undefined;
+    let found: { exit: Tunnel; k: number } | undefined;
+    if (t.role === 'in') {
+      for (let k = 1; k <= TUNNEL_MAX_GAP + 1; k++) {
+        const e = this.entityAt(t.x + DX[t.dir] * k, t.y + DY[t.dir] * k);
+        if (e?.kind !== 'tunnel' || e.dir !== t.dir) continue;
+        if (e.role === 'out') found = { exit: e, k };
+        break; // the first piece in line decides: a second entrance in the way blocks the link
+      }
+    }
+    this.links.set(t.id, found ?? null);
+    return found;
+  }
+  private linkVer = -1;
+  private links = new Map<number, { exit: Tunnel; k: number } | null>();
+
+  /** Decides whether a tunnel piece being placed is an exit (a free entrance lies in line behind it, in range) or an entrance. */
+  private tunnelRoleFor(x: number, y: number, dir: Dir): 'in' | 'out' {
+    for (let k = 1; k <= TUNNEL_MAX_GAP + 1; k++) {
+      const e = this.entityAt(x - DX[dir] * k, y - DY[dir] * k);
+      if (e?.kind !== 'tunnel' || e.dir !== dir) continue;
+      return e.role === 'in' && !this.tunnelLink(e) ? 'out' : 'in';
+    }
+    return 'in';
+  }
+
+  private stepTunnel(t: Tunnel, dt: number): void {
+    if (!t.items.length) return;
+    this.advance(t.items, dt);
+    const front = t.items[0];
+    if (front.pos < 1) return;
+    if (t.role === 'out') {
+      if (this.offer(this.entityAt(t.x + DX[t.dir], t.y + DY[t.dir]), front.type, front.j, t.dir, t.x, t.y)) t.items.shift();
+      return;
+    }
+    const link = this.tunnelLink(t);
+    if (!link) return; // no exit: the items wait at the end of the entrance
+    const start = -link.k * 0.9; // the trip underground takes about as long as walking the same distance
+    const last = link.exit.items[link.exit.items.length - 1];
+    if (last && last.pos < start + ITEM_SPACING) return; // no room yet for another item in the pipe
+    link.exit.items.push({ type: front.type, pos: start, j: front.j });
+    t.items.shift();
+  }
+
   private stepBelt(b: Belt, dt: number): void {
     const items = b.items;
     if (!items.length) return;
@@ -727,7 +818,7 @@ export class World {
   }
 }
 
-const BELT_TAKERS = new Set(['core', 'inserter', 'turret', 'robotfab', 'furnace', 'assembler', 'generator', 'scrapbin']);
+const BELT_TAKERS = new Set(['core', 'inserter', 'turret', 'flamer', 'robotfab', 'hangar', 'foundry', 'heavyworks', 'furnace', 'assembler', 'generator', 'scrapbin']);
 
 /**
  * Belts that end in empty ground beside something that takes items turn to face it, so a line reads as running into the

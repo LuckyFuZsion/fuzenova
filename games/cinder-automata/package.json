@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "gdd": "tsx tools/build-gdd.ts",
-    "tester": "node tools/make-tester-pack.mjs"
+    "tester": "node tools/make-tester-pack.mjs",
+    "deploy": "node tools/deploy.mjs",
+    "stats": "tsx tools/build-statsheets.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",

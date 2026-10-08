@@ -34,6 +34,22 @@ const SPECS: Record<string, Spec> = {
   'turret-scatter-base': { file: 'turret-scatter-base', fit: 'contain', foot: [2, 2], inset: 1 },
   'turret-scatter-barrel': { file: 'turret-scatter-barrel', fit: 'arm', foot: [1, 1], pivot: [0.222, 0.488], reach: 1.4 },
   'turret-sniper-base': { file: 'turret-sniper-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-artillery-base': { file: 'turret-artillery-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-artillery-barrel': { file: 'turret-artillery-barrel', fit: 'arm', foot: [1, 1], pivot: [0.2, 0.5], reach: 2.2 },
+  'turret-flamer-base': { file: 'turret-flame-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-flamer-barrel': { file: 'turret-flame-nozzle', fit: 'arm', foot: [1, 1], pivot: [0.27, 0.5], reach: 1.4 },
+  'turret-incendiary-base': { file: 'turret-rocket-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-incendiary-barrel': { file: 'turret-rocket-launcher', fit: 'arm', foot: [1, 1], pivot: [0.22, 0.5], reach: 1.6 },
+  'turret-torch-base': { file: 'turret-torch-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-torch-barrel': { file: 'turret-torch-nozzle', fit: 'arm', foot: [1, 1], pivot: [0.12, 0.5], reach: 1.8 },
+  'turret-plasma-base': { file: 'turret-laser-base', fit: 'contain', foot: [2, 2], inset: 1 },
+  'turret-plasma-barrel': { file: 'turret-laser-lens', fit: 'arm', foot: [1, 1], pivot: [0.17, 0.5], reach: 2.0 },
+  'coil-shield-idle': { file: 'coil-shield-idle', fit: 'contain', foot: [2, 2], inset: 1.305 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
+  'coil-shield-charged': { file: 'coil-shield-charged', fit: 'contain', foot: [2, 2], inset: 1.305 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
+  'coil-stun-idle': { file: 'coil-stun-idle', fit: 'contain', foot: [2, 2], inset: 1.56 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
+  'coil-stun-charged': { file: 'coil-stun-charged', fit: 'contain', foot: [2, 2], inset: 1.56 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
+  'coil-railgun-idle': { file: 'coil-railgun-idle', fit: 'contain', foot: [2, 2], inset: 2.756 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
+  'coil-railgun-charged': { file: 'coil-railgun-charged', fit: 'contain', foot: [2, 2], inset: 2.756 }, // the picture has room round the base for what sticks out (prongs, rails, glow)
   'turret-sniper-barrel': { file: 'turret-sniper-barrel', fit: 'arm', foot: [1, 1], pivot: [0.147, 0.61], reach: 2.4 },
   // crossover (one tile, no arrows: belts may cross either way) and the splitter gate (two lanes wide, one deep, flowing right)
   crossover: { file: 'crossover', fit: 'contain', foot: [1, 1], inset: 1.02 },
@@ -45,7 +61,13 @@ const SPECS: Record<string, Spec> = {
   'asm-alloy': { file: 'alloy-furnace', fit: 'contain', foot: [3, 3], inset: 1 },
   'asm-forge': { file: 'shell-forge', fit: 'contain', foot: [3, 3], inset: 1 },
   'robot-fab': { file: 'robot-fab-1', fit: 'contain', foot: [3, 3], inset: 1 },
+  hangar: { file: 'hangar', fit: 'contain', foot: [3, 3], inset: 1 },
+  foundry: { file: 'foundry', fit: 'contain', foot: [3, 3], inset: 1 },
+  heavyworks: { file: 'heavyworks', fit: 'contain', foot: [3, 3], inset: 1 },
   pole: { file: 'pole-steel', fit: 'contain', foot: [1, 1], inset: 1.05 },
+  'tunnel-in': { file: 'tunnel-in', fit: 'contain', foot: [1, 1], inset: 1 },
+  'tunnel-out': { file: 'tunnel-out', fit: 'contain', foot: [1, 1], inset: 1 },
+  tunnel: { file: 'tunnel-in', fit: 'contain', foot: [1, 1], inset: 1 },
   scrapbin: { file: 'scrap-bin-idle', fit: 'contain', foot: [2, 2], inset: 1.02 },
   'scrapbin-idle': { file: 'scrap-bin-idle', fit: 'contain', foot: [2, 2], inset: 1.02 },
   'scrapbin-active': { file: 'scrap-bin-active', fit: 'contain', foot: [2, 2], inset: 1.02 },

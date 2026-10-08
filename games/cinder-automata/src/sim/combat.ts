@@ -1,15 +1,15 @@
-﻿// Fight rules: enemies march on the core, turrets and robot soldiers shoot them, fabricators build more robots.
+﻿// Fight rules: enemies march on the core, turrets and robot soldiers shoot them, the robot buildings build more robots.
 import { COSTS, KILL_REWARD, addStock, canPay, pay, type Cost } from './costs';
 import { AMMO, type ItemId } from './items';
 import { COIL_CHARGE_MAX, COIL_CHARGE_RATE, COIL_SHOT_COST, COIL_USE_CHARGING, COIL_USE_FULL, satisfaction, updatePower } from './power';
-import { ENEMIES, armouredDamage } from './enemies';
-import { VARIANTS } from './turrets';
+import { ENEMIES, armouredDamage, damageMul, typedDamage } from './enemies';
+import { BASE_VARIANT, COIL_VARIANTS, VARIANTS } from './turretdata';
 import { isBigRobot } from './commanders';
 import { flowWalk, reachable, variantFor } from './flowfield';
 import { escapeSpot, freeSpot, resetPathBudget, solidAt, walkGround } from './pathfind';
-import { FAB_CAPACITY, ROBOTS, ROBOT_ORDER, ROBOT_SPACE, type Soldier } from './robots';
+import { FAB_CAPACITY, FAB_ROBOTS, ROBOTS, ROBOT_SPACE, type Soldier } from './robots';
 import { robotUnlocked } from './research';
-import { DX, DY, TURRET_MAX_AMMO, accepts, insert, type Belt, type Enemy, type Entity, type Turret, type World } from './world';
+import { DX, DY, TURRET_MAX_AMMO, accepts, insert, isFab, type Belt, type Coil, type Enemy, type Entity, type Turret, type World } from './world';
 
 
 export const TURRET_RANGE = 7;
@@ -31,6 +31,7 @@ const SOLDIER_AGGRO = 16; // tiles: soldiers go after enemies this close to them
 const SOLDIER_RALLY = 90; // tiles: with nothing close, they still march to help against the nearest enemy (but only one inside their leash)
 const SOLDIER_SELF_DEFENCE = 9; // tiles: anything this close is fought wherever the robot happens to be
 export const SOLDIER_LEASH = 30; // tiles: robots only go after enemies within this distance of the fabricator that built them (or the core, if it is gone)
+const CARRIER_REACH = 45; // tiles: a Carrier's drones go after enemies this far from the building that made the Carrier
 const MELEE_REACH = 1.2; // tiles: crawlers stop to chew on a ground robot this close
 
 /** Tiles touching an entity's footprint on its four sides (corners don't count as adjacent). */
@@ -57,6 +58,19 @@ function pullFromBelts(world: World, e: Entity): boolean {
   return false;
 }
 
+/** Damage after a Shield coil's field: within its range a charged Shield coil halves what a building (or the Core) takes, spending charge as it does. */
+function shielded(world: World, x: number, y: number, dmg: number): number {
+  for (const s of world.shields) {
+    if (s.charge <= 1) continue;
+    if (Math.hypot(s.x + s.w / 2 - x, s.y + s.h / 2 - y) > COIL_VARIANTS.shield.range * world.rfx.coilRange) continue;
+    const saved = dmg * 0.5;
+    s.charge = Math.max(0, s.charge - saved * 0.5);
+    s.flash = 0.2;
+    return dmg - saved;
+  }
+  return dmg;
+}
+
 /** Enemies hit buildings for a bit less than they hit the core, so a lost turret is a setback rather than a disaster. */
 const STRUCTURE_DAMAGE = 0.7;
 const THREAT_RANGE = 7; // tiles: enemies notice turrets and walls this close
@@ -71,7 +85,7 @@ function pickStructure(world: World, en: Enemy): Entity | undefined {
     if (e.kind === 'core' || e.kind === 'belt' || e.kind === 'inserter' || e.kind === 'junction' || e.kind === 'splitter') continue;
     const d = Math.hypot(e.x + e.w / 2 - en.x, e.y + e.h / 2 - en.y);
     const power = e.kind === 'pole' || e.kind === 'generator'; // cutting the power is a real threat, but a wall, turret or coil that is nearly as close is hit first
-    const priority = e.kind === 'turret' || e.kind === 'wall' || e.kind === 'coil' || power;
+    const priority = e.kind === 'turret' || e.kind === 'flamer' || e.kind === 'wall' || e.kind === 'coil' || power;
     if (power ? d > POWER_THREAT_RANGE : priority ? d > THREAT_RANGE : d > NEAR_RANGE + Math.max(e.w, e.h) / 2) continue;
     const score = d + (power ? 4 : priority ? 0 : 6); // priority targets win unless a machine is far closer
     if (score < bestD) { best = e; bestD = score; }
@@ -100,17 +114,17 @@ function pickBlocking(world: World, en: Enemy): Entity | undefined {
 function colossusTarget(world: World, en: Enemy): { x: number; y: number; hit: (dmg: number) => void } | undefined {
   let best: Entity | undefined, bestD = COLOSSUS_RANGE;
   for (const e of world.entities.values()) {
-    if (e.kind !== 'turret' && e.kind !== 'coil' && e.kind !== 'wall') continue;
+    if (e.kind !== 'turret' && e.kind !== 'flamer' && e.kind !== 'coil' && e.kind !== 'wall') continue;
     const d = Math.hypot(e.x + e.w / 2 - en.x, e.y + e.h / 2 - en.y);
     if (d < bestD) { best = e; bestD = d; }
   }
   if (best) {
     const b = best;
-    return { x: b.x + b.w / 2, y: b.y + b.h / 2, hit: (dmg) => { b.hp -= dmg; world.markHurt(b.x + b.w / 2, b.y + b.h / 2); if (b.hp <= 0) destroyStructure(world, b); } };
+    return { x: b.x + b.w / 2, y: b.y + b.h / 2, hit: (dmg) => { b.hp -= shielded(world, b.x + b.w / 2, b.y + b.h / 2, dmg); world.markHurt(b.x + b.w / 2, b.y + b.h / 2); if (b.hp <= 0) destroyStructure(world, b); } };
   }
   const core = world.core;
   if (core && Math.hypot(core.x + core.w / 2 - en.x, core.y + core.h / 2 - en.y) < COLOSSUS_RANGE) {
-    return { x: core.x + core.w / 2, y: core.y + core.h / 2, hit: (dmg) => { core.hp = Math.max(0, core.hp - dmg); world.cue('core-hit'); world.markHurt(core.x + core.w / 2, core.y + core.h / 2); } };
+    return { x: core.x + core.w / 2, y: core.y + core.h / 2, hit: (dmg) => { core.hp = Math.max(0, core.hp - shielded(world, core.x + core.w / 2, core.y + core.h / 2, dmg)); world.cue('core-hit'); world.markHurt(core.x + core.w / 2, core.y + core.h / 2); } };
   }
   return undefined;
 }
@@ -176,10 +190,11 @@ function deathFx(world: World, en: Enemy): void {
   }
 }
 
-function nearestEnemy(world: World, cx: number, cy: number, range: number): Enemy | undefined {
+function nearestEnemy(world: World, cx: number, cy: number, range: number, groundOnly = false): Enemy | undefined {
   let best: Enemy | undefined;
   let bestD = range * range;
   for (const en of world.enemies) {
+    if (groundOnly && en.kind && ENEMIES[en.kind].flying) continue;
     const d = (en.x - cx) ** 2 + (en.y - cy) ** 2;
     if (d <= bestD) { best = en; bestD = d; }
   }
@@ -187,10 +202,11 @@ function nearestEnemy(world: World, cx: number, cy: number, range: number): Enem
 }
 
 /** The nearest enemy within `range` of the robot that is also within `leash` of its home, so robots never wander off after something far away. */
-function nearestEnemyNear(world: World, x: number, y: number, range: number, hx: number, hy: number, leash: number): Enemy | undefined {
+function nearestEnemyNear(world: World, x: number, y: number, range: number, hx: number, hy: number, leash: number, groundOnly = false): Enemy | undefined {
   let best: Enemy | undefined, bestD = range * range;
   const l2 = leash * leash;
   for (const en of world.enemies) {
+    if (groundOnly && en.kind && ENEMIES[en.kind].flying) continue;
     const d = (en.x - x) ** 2 + (en.y - y) ** 2;
     if (d <= bestD && (en.x - hx) ** 2 + (en.y - hy) ** 2 <= l2) { best = en; bestD = d; }
   }
@@ -228,7 +244,7 @@ function turretLines(world: World) {
   };
   for (const e of world.entities.values()) if (e.kind === 'belt') hopsOf(e);
   for (const e of world.entities.values()) {
-    if (e.kind !== 'turret') continue;
+    if (e.kind !== 'turret' && e.kind !== 'flamer') continue;
     const lines = new Set<number>();
     for (const p of adjacentTiles(e)) { const b = world.entityAt(p.x, p.y); if (b?.kind === 'belt') lines.add(beltLine.get(b.id)!); }
     for (const l of lines) { const list = mates.get(l) ?? []; list.push(e); mates.set(l, list); }
@@ -264,43 +280,86 @@ function mayPull(world: World, t: Turret): boolean {
   return true;
 }
 
+/** The nearest enemy between `min` and `range` tiles away. */
+function nearestInBand(world: World, cx: number, cy: number, range: number, min: number): Enemy | undefined {
+  let best: Enemy | undefined, bestD = range * range;
+  const m2 = min * min;
+  for (const en of world.enemies) {
+    const d = (en.x - cx) ** 2 + (en.y - cy) ** 2;
+    if (d <= bestD && d >= m2) { best = en; bestD = d; }
+  }
+  return best;
+}
+
+/** How fast an enemy walks right now (slowed by Tar shot or Static field). */
+const enemySpeedNow = (en: Enemy): number => en.speed * (en.slow ? 1 - en.slow.f : 1);
+function slowEnemy(en: Enemy, f: number, secs: number): void {
+  if (f <= 0) return;
+  en.slow = { f: Math.max(f, en.slow?.f ?? 0), t: Math.max(secs, en.slow?.t ?? 0) };
+}
+
+/** Sets an enemy alight (or keeps it burning for the longer of the two fires). */
+function ignite(en: Enemy, dps: number, secs: number): void {
+  en.burn = { dps: Math.max(dps, en.burn?.dps ?? 0), t: Math.max(secs, en.burn?.t ?? 0) };
+}
+
+const SPLASH_RADIUS = 1.2;
+
 function stepTurrets(world: World, dt: number): void {
   for (const e of world.entities.values()) {
-    if (e.kind !== 'turret') continue;
-    const v = VARIANTS[e.variant ?? 'gun'];
+    if (e.kind !== 'turret' && e.kind !== 'flamer') continue;
+    const variant = e.variant ?? BASE_VARIANT[e.kind];
+    const v = VARIANTS[variant];
     e.cooldown = Math.max(0, e.cooldown - dt);
     e.pull -= dt;
     if (e.pull <= 0) { e.pull = TURRET_PULL_INTERVAL; if (mayPull(world, e)) pullFromBelts(world, e); } // looks often, so an item passing along the belt is caught
     const cx = e.x + e.w / 2, cy = e.y + e.h / 2;
-    const range = v.range * world.rfx.turretRange * world.fog;
-    const target = nearestEnemy(world, cx, cy, range);
+    const range = v.range * world.rfx.turretRange * world.mods.turretRange * world.fog;
+    const target = nearestInBand(world, cx, cy, range, v.minRange ?? 0);
     if (!target) continue;
     e.aim = Math.atan2(target.y - cy, target.x - cx);
     if (e.cooldown > 0 || e.ammo <= 0) continue;
     e.ammo--;
     e.cooldown = v.cooldown * world.rfx.turretCooldown;
-    const dmg = e.dmg * v.dmgMul * world.mods.turretDmg * world.rfx.turretDmg;
-    world.cue('bullet-hit');
+    const fire = v.type === 'flame' || v.type === 'energy' ? world.mods.fireDmg : 1; // Ysolde
+    const blastRadius = v.blast ? v.blast * world.mods.blastMul : 0; // Ozric
+    const dmg = e.dmg * v.dmgMul * world.mods.turretDmg * world.rfx.turretDmg * fire * (v.blast ? world.mods.blastDmg : 1);
+    const hit = (en: Enemy): void => { en.hp -= typedDamage(en.kind, dmg, v.type); if (v.burn) ignite(en, v.burn.dps * world.mods.turretDmg * fire, v.burn.secs); };
+    const flame = v.type === 'flame';
+    world.cue(flame ? 'robot-shot' : 'bullet-hit');
     addFx(world, 'fx-muzzle-flash', cx + Math.cos(e.aim) * 1.42, cy + Math.sin(e.aim) * 1.42, v.cone ? 1.5 : 0.95, 0.09, { rot: e.aim, grow: false });
-    if (v.cone) { // scatter: every enemy inside the cone takes the hit
+    if (v.cone) { // scatter and the flamer: every enemy inside the cone takes the hit
       let shown = 0;
       for (const en of world.enemies) {
         const dx = en.x - cx, dy = en.y - cy, d = Math.hypot(dx, dy);
         if (d > range) continue;
         let da = Math.atan2(dy, dx) - e.aim; da = Math.atan2(Math.sin(da), Math.cos(da));
         if (Math.abs(da) > v.cone / 2) continue;
-        en.hp -= armouredDamage(en.kind, dmg);
-        if (shown++ < 6) { world.shots.push({ x1: cx + Math.cos(e.aim) * 1.1, y1: cy + Math.sin(e.aim) * 1.1, x2: en.x, y2: en.y, ttl: SHOT_LIFE }); addFx(world, 'fx-spark', en.x, en.y, 0.5, 0.14, { rot: en.id, grow: false }); }
+        hit(en);
+        if (shown++ < 6) { world.shots.push({ x1: cx + Math.cos(e.aim) * 1.1, y1: cy + Math.sin(e.aim) * 1.1, x2: en.x, y2: en.y, ttl: SHOT_LIFE }); addFx(world, flame ? 'fx-burst' : 'fx-spark', en.x, en.y, flame ? 0.8 : 0.5, 0.14, { rot: en.id, grow: false }); }
       }
+    } else if (v.blast) { // artillery, the incendiary launcher and plasma: the shot bursts over a patch of ground
+      for (const en of world.enemies) if (Math.hypot(en.x - target.x, en.y - target.y) <= blastRadius) hit(en);
+      world.shots.push({ x1: cx + Math.cos(e.aim) * 1.3, y1: cy + Math.sin(e.aim) * 1.3, x2: target.x, y2: target.y, ttl: SHOT_LIFE * 1.5 });
+      addFx(world, flame || v.type === 'energy' ? 'fx-burst' : 'fx-explosion-small', target.x, target.y, blastRadius * 1.6, 0.45);
+      world.cue('structure-destroyed');
     } else {
-      target.hp -= (e.variant === 'sniper') ? Math.max(dmg * 0.6, dmg - (ENEMIES[target.kind ?? 'crawler-1']?.armor ?? 0) * 0.4) : armouredDamage(target.kind, dmg); // the sniper shrugs off most armour
+      if (variant === 'sniper') { // the sniper shrugs off most armour
+        const armor = ENEMIES[target.kind ?? 'crawler-1']?.armor ?? 0;
+        target.hp -= Math.max(dmg * 0.6, dmg - armor * 0.4) * damageMul(target.kind, 'kinetic');
+      } else hit(target);
+      const tm = world.mods; // commander talents on single shots
+      if (tm.splash > 0) for (const en of world.enemies) if (en !== target && Math.hypot(en.x - target.x, en.y - target.y) <= SPLASH_RADIUS) en.hp -= typedDamage(en.kind, dmg * tm.splash, v.type);
+      if (tm.stunChance > 0 && !(target.kind && ENEMIES[target.kind].boss) && (world.stunTally += tm.stunChance) >= 1) { world.stunTally -= 1; target.stun = Math.max(target.stun ?? 0, 1); } // a steady tally, so the sim stays deterministic
+      if (tm.slowHit > 0) slowEnemy(target, tm.slowHit, 2);
       world.shots.push({ x1: cx + Math.cos(e.aim) * 1.3, y1: cy + Math.sin(e.aim) * 1.3, x2: target.x, y2: target.y, ttl: SHOT_LIFE });
-      addFx(world, 'fx-spark', target.x, target.y, e.variant === 'sniper' ? 0.8 : 0.55, 0.14, { rot: e.id, grow: false });
+      addFx(world, flame ? 'fx-burst' : 'fx-spark', target.x, target.y, variant === 'sniper' ? 0.8 : 0.55, 0.14, { rot: e.id, grow: false });
     }
   }
 }
 
 export const COIL_RANGE = 6.5;
+export const RAILGUN_DAMAGE = 160; // to every enemy on the line
 export const COIL_DAMAGE = 30;
 export const COIL_COOLDOWN = 1.3;
 export const COIL_JUMPS = 2; // extra enemies the bolt hops on to after the first
@@ -323,6 +382,7 @@ function zigzag(a: { x: number; y: number }, b: { x: number; y: number }, seed: 
 
 /** Storm coils: power in, chain lightning out. No ammo, but no power means no lightning. */
 function stepCoils(world: World, dt: number): void {
+  world.shields = [];
   for (const e of world.entities.values()) {
     if (e.kind !== 'coil') continue;
     e.cooldown = Math.max(0, e.cooldown - dt);
@@ -332,6 +392,32 @@ function stepCoils(world: World, dt: number): void {
     const full = e.charge >= COIL_CHARGE_MAX - 1e-6;
     e.use = (full ? COIL_USE_FULL : COIL_USE_CHARGING) * world.mods.coilPower; // a full coil asks for almost nothing; a charging one asks for a lot
     if (!full) e.charge = Math.min(COIL_CHARGE_MAX, e.charge + COIL_CHARGE_RATE * satisfaction(world, e) * dt); // it gains what the network can give it
+    const cv = e.variant ?? 'coil', cd = COIL_VARIANTS[cv], crange = cd.range * world.rfx.coilRange;
+    if (cv === 'shield') { world.shields.push(e); continue; } // it protects instead of attacking (see shielded)
+    if (cv === 'stun') { // a pulse that freezes every enemy near it for a moment
+      if (e.cooldown > 0 || e.charge < cd.charge) continue;
+      if (!world.enemies.some((en) => Math.hypot(en.x - cx, en.y - cy) <= crange)) continue;
+      e.charge -= cd.charge; e.cooldown = cd.cooldown; e.flash = 0.35;
+      for (const en of world.enemies) if (Math.hypot(en.x - cx, en.y - cy) <= crange) en.stun = Math.max(en.stun ?? 0, en.kind && ENEMIES[en.kind].boss ? 0.8 : 1.6);
+      addFx(world, 'fx-ring', cx, cy, crange * 2.2, 0.6, { grow: true, rot: e.id });
+      world.cue('coil-zap');
+      continue;
+    }
+    if (cv === 'railgun') { // a charged shot along a line, through everything on it
+      const tgt = nearestEnemy(world, cx, cy, crange);
+      if (!tgt || e.cooldown > 0 || e.charge < cd.charge) continue;
+      e.charge -= cd.charge; e.cooldown = cd.cooldown; e.flash = 0.5;
+      const ang = Math.atan2(tgt.y - cy, tgt.x - cx), ux = Math.cos(ang), uy = Math.sin(ang);
+      const dmg = RAILGUN_DAMAGE * world.mods.coilDmg * world.rfx.coilDmg;
+      for (const en of world.enemies) {
+        const along = (en.x - cx) * ux + (en.y - cy) * uy, across = Math.abs(-(en.x - cx) * uy + (en.y - cy) * ux);
+        if (along > 0 && along <= crange && across <= 0.9) { en.hp -= typedDamage(en.kind, dmg, 'energy'); addFx(world, 'fx-burst', en.x, en.y, 1, 0.25, { grow: true, rot: en.id }); }
+      }
+      world.arcs.push({ pts: [{ x: cx, y: cy - 0.2 }, { x: cx + ux * crange, y: cy - 0.2 + uy * crange }], ttl: 0.4, life: 0.4 });
+      addFx(world, 'fx-ring', cx, cy, 3.2, 0.4, { grow: true, rot: e.id });
+      world.cue('coil-zap');
+      continue;
+    }
     if (!target || e.cooldown > 0 || e.charge < COIL_SHOT_COST) continue; // no enemy, reloading, or not charged enough for a bolt
     e.charge -= COIL_SHOT_COST;
     e.cooldown = COIL_COOLDOWN;
@@ -340,7 +426,8 @@ function stepCoils(world: World, dt: number): void {
     const hit = new Set<number>([target.id]);
     let from = { x: cx, y: cy - 0.3 }, cur: Enemy = target, dmg = COIL_DAMAGE * world.mods.coilDmg * world.rfx.coilDmg;
     for (let i = 0; i <= COIL_JUMPS + world.mods.coilJumps + world.rfx.coilJumps; i++) {
-      cur.hp -= armouredDamage(cur.kind, dmg, true);
+      cur.hp -= typedDamage(cur.kind, dmg, 'lightning');
+      slowEnemy(cur, world.mods.coilSlow, 2);
       world.cue('coil-zap');
       const to = { x: cur.x, y: cur.y };
       world.arcs.push({ pts: zigzag(from, to, e.id * 7 + i + world.anim), ttl: 0.24, life: 0.24 });
@@ -360,20 +447,26 @@ function stepCoils(world: World, dt: number): void {
   }
 }
 
-/** Fabricators pull plates from adjacent belts and, when they have enough, roll a new soldier out of the bottom. */
+/** Robot-making buildings pull plates from adjacent belts and, when they hold a full set for their robot, roll a new soldier out of the bottom. */
 function stepFabs(world: World, dt: number): void {
   for (const e of world.entities.values()) {
-    if (e.kind !== 'robotfab') continue;
+    if (!isFab(e)) continue;
     e.pull -= dt;
     if (e.pull <= 0) { e.pull = PULL_INTERVAL; pullFromBelts(world, e); }
-    if (!robotUnlocked(world, e.type)) { e.type = ROBOT_ORDER.find((t) => robotUnlocked(world, t)) ?? 'scout'; e.progress = 0; } // an old save may name a robot that is not researched yet
+    const makes = FAB_ROBOTS[e.kind];
+    if (!makes.includes(e.type) || !robotUnlocked(world, e.type)) { // an old save, or a robot not researched yet: fall back to the first one this building can make
+      e.type = makes.find((t) => robotUnlocked(world, t)) ?? makes[0]; e.progress = 0;
+    }
     const def = ROBOTS[e.type];
-    if (e.stock < def.cost || world.soldiers.length >= MAX_SOLDIERS) continue;
+    if (world.soldiers.length >= MAX_SOLDIERS) continue;
+    let enough = true;
+    for (const k in def.cost) if ((e.inv[k as ItemId] ?? 0) < (def.cost[k as ItemId] ?? 0)) { enough = false; break; }
+    if (!enough) continue;
     if (fabRoomUsed(world, e.id) + ROBOT_SPACE[e.type] > FAB_CAPACITY) continue; // no room left for this robot: it waits until one is lost
     e.progress += dt;
     if (e.progress >= def.buildTime * (isBigRobot(e.type) ? world.mods.bigBuildTime : world.mods.smallBuildTime)) {
       e.progress = 0;
-      e.stock -= def.cost;
+      for (const k in def.cost) e.inv[k as ItemId] = (e.inv[k as ItemId] ?? 0) - (def.cost[k as ItemId] ?? 0);
       world.soldiers.push({
         id: world.nextSoldierId++, type: e.type, x: e.x + e.w / 2, y: e.y + e.h + 0.6, hp: def.hp * world.mods.robotHp * world.rfx.robotHp, maxHp: def.hp * world.mods.robotHp * world.rfx.robotHp, cool: 0, face: 1, fab: e.id,
       });
@@ -442,15 +535,41 @@ function checkStuck(world: World, s: Soldier, wantsToMove: boolean, dt: number):
   }
 }
 
+/** Carriers launch a small drone every few seconds up to a limit; the drones of a Carrier that has been lost are lost too. */
+function stepCarriers(world: World, dt: number): void {
+  const alive = new Set(world.soldiers.map((s) => s.id));
+  for (const s of world.soldiers) if (s.carrier !== undefined && !alive.has(s.carrier)) s.hp = 0;
+  const born: Soldier[] = [];
+  for (const s of world.soldiers) {
+    const c = ROBOTS[s.type].carries;
+    if (!c || s.hp <= 0) continue;
+    s.launchT = (s.launchT ?? c.every) - dt;
+    if (s.launchT > 0) continue;
+    s.launchT = c.every;
+    const mine = world.soldiers.filter((o) => o.carrier === s.id && o.hp > 0).length + born.filter((o) => o.carrier === s.id).length;
+    if (mine >= c.max || world.soldiers.length + born.length >= MAX_SOLDIERS) continue;
+    const d = ROBOTS[c.drone], hp = d.hp * world.mods.robotHp * world.rfx.robotHp;
+    born.push({ id: world.nextSoldierId++, type: c.drone, x: s.x + (mine - 1.5) * 0.5, y: s.y + 0.6, hp, maxHp: hp, cool: 0, face: s.face, carrier: s.id });
+  }
+  world.soldiers.push(...born);
+}
+
 function stepSoldiers(world: World, dt: number): void {
+  stepCarriers(world, dt);
   const core = world.core;
   const cx = core ? core.x + core.w / 2 : world.w / 2, cy = core ? core.y + core.h / 2 : world.h / 2;
   for (const s of world.soldiers) {
     const def = ROBOTS[s.type];
     s.cool = Math.max(0, s.cool - dt);
+    if (s.cool2) s.cool2 = Math.max(0, s.cool2 - dt);
+    if (def.regen && s.hp < s.maxHp) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * def.regen * dt);
     const home = s.fab !== undefined ? world.entities.get(s.fab) : undefined; // its creator, else the core
-    const hx = home ? home.x + home.w / 2 : cx, hy = home ? home.y + home.h / 2 : cy;
-    const target = nearestEnemy(world, s.x, s.y, SOLDIER_SELF_DEFENCE) ?? nearestEnemyNear(world, s.x, s.y, SOLDIER_AGGRO, hx, hy, SOLDIER_LEASH) ?? nearestEnemyNear(world, s.x, s.y, SOLDIER_RALLY, hx, hy, SOLDIER_LEASH); // an attack anywhere in the base brings every robot, but never far beyond it
+    const mother = s.carrier !== undefined ? world.soldiers.find((o) => o.id === s.carrier) : undefined; // a launched drone keeps to its Carrier
+    const hx = mother ? mother.x : home ? home.x + home.w / 2 : cx, hy = mother ? mother.y : home ? home.y + home.h / 2 : cy;
+    const g = !!def.bomb; // a bomber only goes after things on the ground
+    const unarmed = def.dps <= 0; // a Carrier only launches drones: it stays at its post and never goes after anything
+    const reach = mother ? CARRIER_REACH : SOLDIER_LEASH; // a Carrier's drones range far from their mother; she stays at home
+    const target = unarmed ? undefined : nearestEnemy(world, s.x, s.y, SOLDIER_SELF_DEFENCE, g) ?? nearestEnemyNear(world, s.x, s.y, SOLDIER_AGGRO, hx, hy, reach, g) ?? nearestEnemyNear(world, s.x, s.y, SOLDIER_RALLY, hx, hy, reach, g); // an attack anywhere in the base brings every robot, but never far beyond it
     let tx: number, ty: number, speed = def.speed * world.mods.robotSpeed;
     let chasing = false; // wants to reach an enemy that is out of range
     if (target) {
@@ -458,17 +577,42 @@ function stepSoldiers(world: World, dt: number): void {
       s.face = target.x >= s.x ? 1 : -1;
       if (d <= def.range * world.rfx.robotRange) {
         tx = s.x; ty = s.y; // in range: hold position and shoot
-        if (s.cool <= 0) {
+        if (s.cool <= 0 && def.bomb) { // a bombing run: the bomb bursts over everything on the ground nearby
           s.cool = def.cooldown;
-          target.hp -= armouredDamage(target.kind, def.dps * world.mods.robotDps * world.rfx.robotDps * def.cooldown);
-          world.cue('robot-shot');
-          world.shots.push({ x1: s.x, y1: s.y - 0.4, x2: target.x, y2: target.y, ttl: SHOT_LIFE });
-          addFx(world, 'fx-spark', target.x, target.y, 0.4, 0.12, { rot: s.id + world.time, grow: false });
+          const dmg = def.dps * world.mods.robotDps * world.rfx.robotDps * def.cooldown;
+          for (const en of world.enemies) {
+            if (en.kind && ENEMIES[en.kind].flying) continue;
+            if (Math.hypot(en.x - target.x, en.y - target.y) <= def.bomb.radius) en.hp -= typedDamage(en.kind, dmg, 'kinetic');
+          }
+          world.cue('structure-destroyed');
+          addFx(world, 'fx-explosion-small', target.x, target.y, def.bomb.radius * 1.3, 0.4);
+        } else if (s.cool <= 0) {
+          s.cool = def.cooldown;
+          const air = target.kind && ENEMIES[target.kind].flying ? def.airBonus ?? 1 : 1; // the Interceptor is made for flyers
+          const dmg = def.dps * world.mods.robotDps * world.rfx.robotDps * def.cooldown * air;
+          if (def.splash) { // artillery: the shell bursts over a patch of ground
+            for (const en of world.enemies) if (Math.hypot(en.x - target.x, en.y - target.y) <= def.splash) en.hp -= typedDamage(en.kind, dmg, 'kinetic');
+            addFx(world, 'fx-explosion-small', target.x, target.y, def.splash * 1.4, 0.4);
+            world.cue('structure-destroyed');
+          } else {
+            target.hp -= typedDamage(target.kind, dmg, 'kinetic');
+            world.cue('robot-shot');
+            addFx(world, 'fx-spark', target.x, target.y, 0.4, 0.12, { rot: s.id + world.time, grow: false });
+          }
+          world.shots.push({ x1: s.x, y1: s.y - 0.4, x2: target.x, y2: target.y, ttl: SHOT_LIFE * (def.splash ? 1.5 : 1) });
+        }
+        if (def.alt && (s.cool2 ?? 0) <= 0) { // the Titan's cannon: a slow, heavy shot that armour barely stops
+          s.cool2 = def.alt.cooldown;
+          const big = def.alt.dps * world.mods.robotDps * world.rfx.robotDps * def.alt.cooldown;
+          target.hp -= typedDamage(target.kind, big, 'kinetic');
+          addFx(world, 'fx-explosion-small', target.x, target.y, 1.1, 0.3);
+          world.cue('structure-destroyed');
+          world.shots.push({ x1: s.x, y1: s.y - 0.6, x2: target.x, y2: target.y, ttl: SHOT_LIFE * 1.6 });
         }
       } else { tx = target.x; ty = target.y; chasing = true; }
     } else {
       // nothing to fight: go to this robot's guard post just outside the base and stand there
-      const post = guardPost(world, s, cx, cy);
+      const post = def.carries && home ? { x: home.x + home.w / 2, y: home.y + home.h + 2.5 } : mother ? { x: mother.x + ((s.id % 5) - 2) * 0.8, y: mother.y + 1.2 } : guardPost(world, s, cx, cy); // a Carrier waits by its building, its drones round her
       tx = post.x; ty = post.y;
       speed *= 0.8;
     }
@@ -507,7 +651,7 @@ export function stepAmbient(world: World, dt: number): void {
   const puff = ambientTimer <= 0;
   if (puff) ambientTimer = 1.1;
   for (const e of world.entities.values()) {
-    if (e.kind === 'turret' && !nearestEnemy(world, e.x + 1, e.y + 1, TURRET_RANGE)) e.aim += dt * (e.id % 2 ? 0.45 : -0.45); // slow scanning sweep
+    if ((e.kind === 'turret' || e.kind === 'flamer') && !nearestEnemy(world, e.x + 1, e.y + 1, TURRET_RANGE)) e.aim += dt * (e.id % 2 ? 0.45 : -0.45); // slow scanning sweep
     if (puff && e.kind === 'furnace') {
       addFx(world, 'fx-smoke-wisp', e.x + 1 + (Math.random() - 0.5) * 0.5, e.y + 0.2, 1.5, 2.6, { add: false, grow: true, opacity: 0.5, rot: Math.random() * 6 });
     }
@@ -529,15 +673,15 @@ function moveEnemy(world: World, en: Enemy, tx: number, ty: number, dt: number):
   if (en.kind && ENEMIES[en.kind].flying) {
     const dx = tx - en.x, dy = ty - en.y, d = Math.hypot(dx, dy);
     if (d < 1e-6) return false;
-    const k = Math.min(d, en.speed * dt) / d;
+    const k = Math.min(d, enemySpeedNow(en) * dt) / d;
     en.x += dx * k; en.y += dy * k;
     return true;
   }
   const def = en.kind ? ENEMIES[en.kind] : undefined;
-  const v = flowWalk(world, en, tx, ty, en.speed, dt, variantFor(en.kind, def?.scale ?? 1)); // straight at it when it can see it, else along the shared flow field
+  const v = flowWalk(world, en, tx, ty, enemySpeedNow(en), dt, variantFor(en.kind, def?.scale ?? 1)); // straight at it when it can see it, else along the shared flow field
   if (v) return Math.hypot(v.x, v.y) > 1e-6;
   if (reachable(world, variantFor(en.kind, def?.scale ?? 1), en.x, en.y)) return false; // on the field but blocked by a building: the caller attacks it
-  const w2 = walkGround(world, en, tx, ty, en.speed, dt, en.kind === 'brute-3'); // not on the field (no core, or boxed in): the old route search
+  const w2 = walkGround(world, en, tx, ty, enemySpeedNow(en), dt, en.kind === 'brute-3'); // not on the field (no core, or boxed in): the old route search
   return !!w2 && Math.hypot(w2.x, w2.y) > 1e-6;
 }
 
@@ -573,7 +717,7 @@ function smashBlocker(world: World, en: Enemy, dt: number): void {
     if (d < bestD) { best = e; bestD = d; }
   }
   if (!best) return;
-  best.hp -= en.dmg * STRUCTURE_DAMAGE * dt;
+  best.hp -= shielded(world, best.x + best.w / 2, best.y + best.h / 2, en.dmg * STRUCTURE_DAMAGE * dt);
   world.cue('structure-hit'); world.markHurt(best.x + best.w / 2, best.y + best.h / 2);
   if (best.hp <= 0) destroyStructure(world, best);
 }
@@ -590,18 +734,18 @@ function rangedStep(world: World, en: Enemy, dt: number, cx: number, cy: number)
   en.abil = Math.max(0, (en.abil ?? 0) - dt);
   let best: { x: number; y: number; hit: (d: number) => void } | undefined, bd = def.range;
   for (const s of world.soldiers) { // robots first: the ones on the front line are the ones in reach
-    const d = Math.hypot(s.x - en.x, s.y - en.y);
+    const d = Math.hypot(s.x - en.x, s.y - en.y) * (ROBOTS[s.type].taunt ? 0.5 : 1); // a tank draws fire
     if (d < bd) { bd = d; best = { x: s.x, y: s.y, hit: (dmg) => { s.hp -= dmg; world.markHurt(s.x, s.y); } }; }
   }
   for (const e of world.entities.values()) {
-    if (e.kind !== 'turret' && e.kind !== 'wall' && e.kind !== 'coil' && e.kind !== 'pole' && e.kind !== 'generator') continue;
+    if (e.kind !== 'turret' && e.kind !== 'flamer' && e.kind !== 'wall' && e.kind !== 'coil' && e.kind !== 'pole' && e.kind !== 'generator') continue;
     const d = Math.hypot(e.x + e.w / 2 - en.x, e.y + e.h / 2 - en.y) - Math.max(e.w, e.h) / 2 + (e.kind === 'pole' || e.kind === 'generator' ? 4 : 0);
-    if (d < bd) { bd = d; best = { x: e.x + e.w / 2, y: e.y + e.h / 2, hit: (dmg) => { e.hp -= dmg * STRUCTURE_DAMAGE; world.markHurt(e.x + e.w / 2, e.y + e.h / 2); if (e.hp <= 0) destroyStructure(world, e); } }; }
+    if (d < bd) { bd = d; best = { x: e.x + e.w / 2, y: e.y + e.h / 2, hit: (dmg) => { e.hp -= shielded(world, e.x + e.w / 2, e.y + e.h / 2, dmg * STRUCTURE_DAMAGE); world.markHurt(e.x + e.w / 2, e.y + e.h / 2); if (e.hp <= 0) destroyStructure(world, e); } }; }
   }
   const core = world.core;
   if (core) {
     const d = Math.hypot(cx - en.x, cy - en.y) - 1.5;
-    if (d < bd) { bd = d; best = { x: cx, y: cy, hit: (dmg) => { core.hp = Math.max(0, core.hp - dmg); world.cue('core-hit'); world.markHurt(core.x + core.w / 2, core.y + core.h / 2); } }; }
+    if (d < bd) { bd = d; best = { x: cx, y: cy, hit: (dmg) => { core.hp = Math.max(0, core.hp - shielded(world, core.x + core.w / 2, core.y + core.h / 2, dmg)); world.cue('core-hit'); world.markHurt(core.x + core.w / 2, core.y + core.h / 2); } }; }
   }
   if (!best) { // nothing in range yet: keep walking on the usual target (the nearest turret or wall, else the core)
     const t = pickStructure(world, en);
@@ -626,13 +770,20 @@ export function stepCombat(world: World, dt: number): void {
   stepFabs(world, dt);
   stepSoldiers(world, dt);
 
+  for (const en of world.enemies) if (en.slow && (en.slow.t -= dt) <= 0) en.slow = undefined;
+  for (const en of world.enemies) { // anything on fire keeps taking damage until the fire goes out
+    if (!en.burn) continue;
+    en.hp -= typedDamage(en.kind, en.burn.dps * dt, 'flame');
+    en.burn.t -= dt;
+    if (en.burn.t <= 0) en.burn = undefined;
+  }
   separateEnemies(world, dt);
   const before = world.enemies.length;
   for (const en of world.enemies) if (en.hp <= 0) deathFx(world, en);
   world.enemies = world.enemies.filter((en) => en.hp > 0);
   const killed = before - world.enemies.length;
   world.kills += killed;
-  if (killed > 0 && !world.freeBuild) addStock(world, KILL_REWARD, killed * (1 + world.bounty));
+  if (killed > 0 && !world.freeBuild) addStock(world, KILL_REWARD, killed * (1 + world.bounty + world.mods.killBonus));
 
   // enemies march on the core. Gentle rules: they stop for a ground robot in their way, and otherwise
   // go after turrets and walls first (then other machines that are right beside them), before the core.
@@ -640,7 +791,20 @@ export function stepCombat(world: World, dt: number): void {
   if (core) {
     const cx = core.x + core.w / 2, cy = core.y + core.h / 2;
     for (const en of world.enemies) {
+      if (en.stun !== undefined && en.stun > 0) { en.stun -= dt; continue; } // frozen by a Stun coil: no moving, no attacking
       if (rangedStep(world, en, dt, cx, cy)) continue;
+      let tank: (typeof world.soldiers)[number] | undefined, td = 0;
+      for (const s of world.soldiers) { // a Heavy walker draws nearby ground enemies to it
+        const t = ROBOTS[s.type].taunt;
+        if (!t || ROBOTS[s.type].flying) continue;
+        const d = Math.hypot(s.x - en.x, s.y - en.y);
+        if (d <= t && (!tank || d < td)) { tank = s; td = d; }
+      }
+      if (tank) {
+        if (td > MELEE_REACH) moveEnemy(world, en, tank.x, tank.y, dt);
+        else { tank.hp -= en.dmg * dt; world.markHurt(tank.x, tank.y); }
+        continue;
+      }
       let victim: (typeof world.soldiers)[number] | undefined;
       let vd = MELEE_REACH;
       for (const s of world.soldiers) {
@@ -676,7 +840,7 @@ export function stepCombat(world: World, dt: number): void {
         if (d > reach) {
           if (!moveEnemy(world, en, tx, ty, dt)) smashBlocker(world, en, dt);
         } else {
-          target.hp -= en.dmg * STRUCTURE_DAMAGE * (brute ? BRUTE_SMASH : 1) * dt;
+          target.hp -= shielded(world, target.x + target.w / 2, target.y + target.h / 2, en.dmg * STRUCTURE_DAMAGE * (brute ? BRUTE_SMASH : 1) * dt);
           world.cue('structure-hit'); world.markHurt(target.x + target.w / 2, target.y + target.h / 2);
           if (target.hp <= 0) destroyStructure(world, target);
         }
@@ -687,7 +851,7 @@ export function stepCombat(world: World, dt: number): void {
       if (d > ATTACK_REACH) {
         if (!moveEnemy(world, en, cx, cy, dt)) smashBlocker(world, en, dt);
       } else {
-        core.hp = Math.max(0, core.hp - en.dmg * dt);
+        core.hp = Math.max(0, core.hp - shielded(world, cx, cy, en.dmg * dt));
         world.cue('core-hit'); world.markHurt(cx, cy);
       }
     }

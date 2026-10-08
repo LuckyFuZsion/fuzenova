@@ -695,3 +695,56 @@ img.hi { width: 15px; height: 15px; object-fit: contain; vertical-align: -3px; m
 #discovery h2 { margin: 0; font-size: 24px; color: #ffe2b0; }
 #discovery p { margin: 0; font-size: 14px; line-height: 1.5; color: #d9cfc4; }
 #discovery button { margin-top: 6px; padding: 10px 34px; border: 0; border-radius: 999px; cursor: pointer; background: linear-gradient(180deg, #ffb347, #e8730c); color: #1a0e04; font: 800 14px Inter, system-ui, sans-serif; }
+
+#bar button.locked { opacity: 0.45; filter: grayscale(0.8); }
+#bar button.locked::after { content: 'Research'; position: absolute; left: 50%; top: 4px; transform: translateX(-50%); font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #ffb347; }
+/* Workshop */
+#workshop { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; background: rgba(8, 5, 4, 0.72); animation: fade 0.2s; overflow: auto; padding: 16px; }
+#workshop .card { zoom: var(--u); width: min(640px, 94vw); max-height: calc(92vh / var(--u, 1)); overflow: auto; display: flex; flex-direction: column; gap: 12px; padding: 22px 24px; border-radius: 18px; background: linear-gradient(180deg, rgba(40, 30, 26, 0.98), rgba(22, 16, 14, 0.98)); border: 1px solid rgba(255, 170, 70, 0.4); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+#workshop header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+#workshop header small { text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: 800; color: #ffb347; }
+#workshop h2 { margin: 2px 0 0; font-size: 22px; color: #ffe2b0; }
+#workshop .wb { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; border-radius: 12px; background: rgba(255, 140, 40, 0.12); border: 1px solid rgba(255, 170, 70, 0.4); }
+#workshop .wb b { font-size: 26px; color: #ffb347; line-height: 1; }
+#workshop .wb span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #d9cfc4; }
+#workshop p { margin: 0; font-size: 13px; line-height: 1.5; color: #d9cfc4; }
+#workshop .perks { display: grid; gap: 8px; }
+#workshop .perk { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+#workshop .perk.maxed { border-color: rgba(120, 220, 140, 0.45); }
+#workshop .pt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+#workshop .pt b { color: #ffe2b0; font-size: 14px; }
+#workshop .pt small { color: #bfb3a6; font-size: 12px; }
+#workshop .pips { display: flex; gap: 3px; margin-top: 2px; }
+#workshop .pips i { width: 12px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+#workshop .pips i.on { background: linear-gradient(90deg, #ffb347, #e8730c); }
+#workshop button { padding: 8px 16px; border: 0; border-radius: 999px; cursor: pointer; background: linear-gradient(180deg, #ffb347, #e8730c); color: #1a0e04; font: 800 13px Inter, system-ui, sans-serif; white-space: nowrap; }
+#workshop button:disabled { background: rgba(255, 255, 255, 0.1); color: #8f857a; cursor: default; }
+#workshop footer { display: flex; justify-content: flex-end; }
+
+/* talents on the commander cards, and in the Workshop */
+.cs-tals { width: 100%; margin-top: 6px; text-align: left; display: grid; gap: 4px; }
+.cs-tals h5 { margin: 0; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+.cs-tal { display: grid; gap: 2px; font-size: 11.5px; }
+.cs-tal > span { opacity: 0.55; font-size: 10px; }
+.cs-tal select { width: 100%; background: rgba(255, 255, 255, 0.07); color: inherit; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 7px; padding: 4px 6px; font: inherit; }
+.cs-tal select option { color: #111; }
+.cs-tal em { font-style: normal; opacity: 0.65; line-height: 1.25; font-size: 10.5px; }
+#workshop h3 { margin: 16px 0 6px; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+#workshop .perk.owned { border-color: rgba(120, 220, 140, 0.45); }
+
+#workshop .ledger { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; background: rgba(255, 255, 255, 0.03); }
+#workshop .ledger summary { cursor: pointer; font-weight: 800; color: #ffe2b0; font-size: 14px; }
+#workshop .ledger h4 { margin: 12px 0 4px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #ffb347; }
+#workshop .ltotals { display: flex; gap: 8px; margin-top: 10px; }
+#workshop .ltotals div { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px; border-radius: 10px; background: rgba(255, 140, 40, 0.1); }
+#workshop .ltotals b { font-size: 20px; color: #ffb347; line-height: 1.1; }
+#workshop .ltotals span { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; color: #d9cfc4; }
+#workshop .ledger ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; max-height: 220px; overflow: auto; }
+#workshop .ledger li { display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; color: #d9cfc4; padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+#workshop .ledger li > span:first-child:not(.lw) { flex: 1; }
+#workshop .ledger .lw { flex: none; width: 118px; color: #a89c8f; font-size: 11.5px; }
+#workshop .ledger .lt { flex: 1; }
+#workshop .ledger li b { flex: none; min-width: 42px; text-align: right; }
+#workshop .ledger b.gain { color: #7bd88f; }
+#workshop .ledger b.cost { color: #ff9a7a; }
+#workshop .lsum li b { color: #ffe2b0; }

@@ -44,15 +44,17 @@ export const TECHS: Tech[] = [
   { id: 'proj-damage', name: 'Projectile damage', branch: 'projectile', pack: P, effect: '+12% damage per shot from gun turrets', costs: packs(P, E, 5, 8, 12, 18, 26) },
   { id: 'proj-rate', name: 'Rate of fire', branch: 'projectile', pack: P, effect: 'Gun turrets fire 6% faster', costs: packs(P, E, 4, 7, 11, 16, 24) },
   { id: 'proj-range', name: 'Targeting optics', branch: 'projectile', pack: P, effect: '+10% range for gun turrets', costs: packs(P, E, 6, 10, 16) },
-  { id: 'ammo-bullets', name: 'Ammunition', branch: 'projectile', pack: P, effect: 'Level 1 unlocks bullets (casings and bullets in the Assembler). Level 2 unlocks steel and artillery shells.', costs: packs(P, E, 8, 16) },
-  { id: 'turret-designs', name: 'Turret designs', branch: 'projectile', pack: P, effect: 'Level 1 unlocks the Scatter gun (short range, hits everything in a cone). Level 2 unlocks the Sniper (long range, slow, hits very hard). Upgrade a gun turret by double-clicking it.', costs: packs(P, E, 6, 12) },
+  { id: 'ammo-bullets', name: 'Ammunition', branch: 'projectile', pack: P, effect: 'Level 1 unlocks bullets (copper plate + coal in the Assembler). Level 2 unlocks steel and artillery shells.', costs: packs(P, E, 8, 16) },
+  { id: 'turret-designs', name: 'Turret designs', branch: 'projectile', pack: P, effect: 'Level 1 unlocks the Scatter gun (short range, hits everything in a cone). Level 2 unlocks the Sniper (long range, slow, hits very hard). Level 3 unlocks Artillery (a very long range, bursts over an area, needs shells; upgrade a Scatter gun or Sniper into it). Upgrade a gun turret by double-clicking it.', costs: packs(P, E, 6, 12, 20) },
+  { id: 'flame-designs', name: 'Flame designs', branch: 'projectile', pack: P, effect: 'Level 1 unlocks the Flamer (build it from the Defence group; it burns coal, charcoal or wood). Level 2 unlocks the Incendiary launcher and the Focused torch. Level 3 unlocks the Plasma cannon. Upgrade a Flamer by double-clicking it.', costs: packs(P, E, 6, 10, 18) },
   { id: 'fortify', name: 'Reinforced structures', branch: 'fortification', pack: P, effect: '+15% health for turrets and walls', costs: packs(P, E, 6, 10, 16, 24) },
   // ---- electromagnetic weapons ----
   { id: 'em-damage', name: 'Electromagnetic damage', branch: 'electromagnetic', pack: E, effect: '+15% lightning damage from Storm coils', costs: packs(E, R, 5, 9, 14, 21, 30) },
+  { id: 'coil-designs', name: 'Coil designs', branch: 'electromagnetic', pack: E, effect: 'Level 1 unlocks the Shield coil (protects nearby buildings) and the Stun coil (freezes enemies for a moment). Level 2 unlocks the Railgun (a long piercing shot). Upgrade a Storm coil by double-clicking it.', costs: packs(E, P, 6, 12) },
   { id: 'em-hops', name: 'Chain conductors', branch: 'electromagnetic', pack: E, effect: 'Lightning jumps to 1 more enemy', costs: packs(E, R, 8, 14, 22), requires: { id: 'em-damage', level: 2 } },
   { id: 'em-range', name: 'Field focusing', branch: 'electromagnetic', pack: E, effect: '+10% range for Storm coils', costs: packs(E, R, 6, 10, 16) },
   // ---- robotics: designs, ammunition, armour, sights ----
-  { id: 'robot-designs', name: 'Robot designs', branch: 'robotics', pack: R, effect: 'Unlocks new robots: 1 Trooper and Gunship drone, 2 Heavy walker, 3 Turret walker, 4 Mobile artillery, 5 Titan', costs: packs(R, P, 6, 10, 16, 24, 36) },
+  { id: 'robot-designs', name: 'Robot designs', branch: 'robotics', pack: R, effect: 'Unlocks new robots: 1 Trooper and Gunship drone, 2 Heavy walker and Sapper drone, 3 Turret walker and Interceptor, 4 Mobile artillery, 5 Titan and Carrier', costs: packs(R, P, 6, 10, 16, 24, 36) },
   { id: 'robot-weapons', name: 'Robot ammunition', branch: 'robotics', pack: R, effect: 'Better rounds for your robots: +12% robot damage (hardened, piercing, incendiary, plasma)', costs: packs(R, P, 6, 10, 16, 24) },
   { id: 'robot-plating', name: 'Robot plating', branch: 'robotics', pack: R, effect: '+12% robot health', costs: packs(R, P, 6, 10, 16, 24) },
   { id: 'robot-range', name: 'Robot sights', branch: 'robotics', pack: R, effect: '+10% weapon range for your robots', costs: packs(R, P, 8, 14, 22) },
@@ -93,13 +95,12 @@ export function researchFx(w: World): ResearchFx {
 
 /** The research level of 'Robot designs' at which each robot type becomes available. */
 export const ROBOT_UNLOCK: Record<RobotType, number> = {
-  'drone-1': 0, scout: 0, trooper: 1, 'drone-2': 1, heavy: 2, quad: 3, artillery: 4, titan: 5,
+  'drone-1': 0, scout: 0, trooper: 1, 'drone-2': 1, bomber: 2, heavy: 2, interceptor: 3, quad: 3, artillery: 4, titan: 5, carrier: 5,
 };
 export const robotUnlocked = (w: World, t: RobotType): boolean => levelOf(w, 'robot-designs') >= ROBOT_UNLOCK[t];
 
 /** Assembler recipes that need research (everything else, including the science packs themselves, is open from the start). */
 export const RECIPE_UNLOCK: Record<string, { tech: string; level: number }> = {
-  'bullet-casing': { tech: 'ammo-bullets', level: 1 },
   bullet: { tech: 'ammo-bullets', level: 1 },
   steel: { tech: 'ammo-bullets', level: 2 },
   'science-advanced': { tech: 'ammo-bullets', level: 2 },

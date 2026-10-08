@@ -1,5 +1,5 @@
 ﻿import {
-  ASSEMBLER_OUT_MAX, BELT_SPEED, DX, DY, ITEMS, KINDS, SMELT_TIME, SWING_TIME, createEntity, footprint, minerContacts, opposite,
+  ASSEMBLER_OUT_MAX, isFab, BELT_SPEED, DX, DY, ITEMS, KINDS, SMELT_TIME, SWING_TIME, createEntity, footprint, minerContacts, opposite,
   type Belt, type Dir, type Entity, type Kind, type World,
 } from './sim/world';
 import { VARIANTS } from './sim/turrets';
@@ -13,6 +13,7 @@ import { FAB_CAPACITY, ROBOT_SPACE } from './sim/robots';
 import { COIL_CHARGE_MAX } from './sim/power';
 import { ROBOTS } from './sim/robots';
 import { ENEMIES } from './sim/enemies';
+import { BASE_VARIANT, COIL_VARIANTS } from './sim/turretdata';
 import { problemOf } from './sim/status';
 import { drawGroundMood, drawLighting, drawShadows } from './atmosphere';
 
@@ -209,7 +210,27 @@ function wallPiece(world: World | undefined, e: Entity): { sprite: string; turns
 }
 
 /** Cables between linked poles (bright when their network has power), and a warning bolt over anything that is not wired up. */
+function drawTunnels(ctx: CanvasRenderingContext2D, world: World, list: Entity[]): void {
+  for (const t of list) { // the way under the ground between a pair: a faint dashed line, with the items on their way drawn dim along it
+    if (t.kind !== 'tunnel' || t.role !== 'in') continue;
+    const link = world.tunnelLink(t);
+    if (!link) continue;
+    const ax = t.x + 0.5, ay = t.y + 0.5, bx = link.exit.x + 0.5, by = link.exit.y + 0.5;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(217,164,65,0.35)'; ctx.lineWidth = 0.06; ctx.lineCap = 'round'; ctx.setLineDash([0.16, 0.14]);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
+    ctx.globalAlpha = 0.5;
+    for (const it of link.exit.items) {
+      if (it.pos >= 0) continue;
+      const back = Math.min(link.k, -it.pos / 0.9); // tiles back from the exit
+      drawItem(ctx, it.type, bx - (bx - ax) * (back / link.k), by - (by - ay) * (back / link.k), 0.32);
+    }
+    ctx.restore();
+  }
+}
+
 function drawWires(ctx: CanvasRenderingContext2D, world: World, list: Entity[]): void {
+  drawTunnels(ctx, world, list);
   const p = world.power;
   if (!p) return;
   // three looks: no power (dull, dashed), short of power (amber, slow pulses), full power (glowing blue, quick pulses running along the wire)
@@ -749,6 +770,15 @@ function drawCombat(ctx: CanvasRenderingContext2D, world: World, x0: number, x1:
       if (!def.flying) ctx.rotate(Math.sin(world.anim * 10 + en.id) * 0.05); // scuttling wobble
       drawSprite(ctx, espr, -def.scale / 2, -def.scale / 2);
       ctx.restore();
+      if (en.burn) { // on fire: a flickering orange glow over it
+        const g = ctx.createRadialGradient(en.x, en.y - lift, 0.02, en.x, en.y - lift, def.scale * 0.6);
+        g.addColorStop(0, `rgba(255,170,50,${0.55 + Math.sin(world.anim * 18 + en.id) * 0.15})`); g.addColorStop(1, 'rgba(255,90,20,0)');
+        ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(en.x, en.y - lift, def.scale * 0.6, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+      }
+      if (en.stun && en.stun > 0) { // frozen by a Stun coil: a pale ring
+        ctx.strokeStyle = 'rgba(255,230,120,0.8)'; ctx.lineWidth = 0.06; ctx.setLineDash([0.12, 0.1]);
+        ctx.beginPath(); ctx.arc(en.x, en.y - lift, def.scale * 0.55, world.anim * 3, world.anim * 3 + Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+      }
       if (en.hp < en.maxHp || def.boss) healthBar(ctx, en.x, en.y - lift - def.scale * 0.55, Math.max(0.6, def.scale * 0.55), en.hp / en.maxHp);
       continue;
     }
@@ -915,6 +945,26 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
       }
       break;
     }
+    case 'tunnel': { // an entrance (a dark mouth the belt runs into) or an exit (the belt comes up out of a ramp); the picture points the way it flows
+      const spr = getSprite(e.role === 'in' ? 'tunnel-in' : 'tunnel-out');
+      ctx.translate(e.x + 0.5, e.y + 0.5);
+      ctx.rotate((e.dir * Math.PI) / 2);
+      if (spr) drawSprite(ctx, spr, -0.5, -0.5);
+      else {
+        ctx.fillStyle = '#3b4148'; ctx.fillRect(-0.5, -0.5, 1, 1);
+        ctx.fillStyle = '#2b2622'; ctx.beginPath(); ctx.roundRect(-0.46, -0.46, 0.92, 0.92, 0.1); ctx.fill();
+        ctx.strokeStyle = '#6b5f55'; ctx.lineWidth = 0.05; ctx.stroke();
+        ctx.fillStyle = '#0d0a09'; // the mouth: at the front of an entrance, at the back of an exit
+        ctx.beginPath(); ctx.roundRect(e.role === 'in' ? 0.0 : -0.46, -0.3, 0.46, 0.6, 0.1); ctx.fill();
+        ctx.fillStyle = '#d9a441';
+        ctx.beginPath(); ctx.moveTo(-0.18, -0.16); ctx.lineTo(0.02, 0); ctx.lineTo(-0.18, 0.16); ctx.closePath(); ctx.fill();
+      }
+      for (const it of e.items) { // items on the piece itself (not those still underground)
+        if (it.pos < 0) continue;
+        drawItem(ctx, it.type, it.pos - 0.5, (it.j ?? 0) * 0.12, 0.36);
+      }
+      break;
+    }
     case 'splitter': { // a gate across two belts: items come in behind, and go out of either tile in front
       const belt = getSprite('belt'), art = getSprite('splitter-gate');
       ctx.translate(e.x + e.w / 2, e.y + e.h / 2);
@@ -1040,9 +1090,10 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
       }
       break;
     }
-    case 'turret': {
+    case 'turret': case 'flamer': {
       const cx = e.x + 1, cy = e.y + 1;
-      const vk = e.variant && e.variant !== 'gun' ? e.variant : '';
+      const vname = e.variant ?? BASE_VARIANT[e.kind];
+      const vk = vname === 'gun' ? '' : vname;
       const base = (vk && getSprite(`turret-${vk}-base`)) || getSprite('turret-base'), barrel = (vk && getSprite(`turret-${vk}-barrel`)) || getSprite('turret-barrel');
       const ownArt = !!vk && !!getSprite(`turret-${vk}-base`);
       if (base && barrel) {
@@ -1054,8 +1105,8 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
           ctx.fillStyle = k < lit ? '#ffa03a' : 'rgba(20,16,14,0.75)';
           ctx.beginPath(); ctx.arc(cx + Math.cos(a) * 0.9, cy + Math.sin(a) * 0.9, 0.045, 0, Math.PI * 2); ctx.fill();
         }
-        const tv = VARIANTS[e.variant ?? 'gun'];
-        if (e.variant && !ownArt) { // without its own art an upgraded turret wears a coloured ring round its hub, and its barrel changes shape
+        const tv = VARIANTS[vname];
+        if (vk && !ownArt) { // without its own art an upgraded turret wears a coloured ring round its hub, and its barrel changes shape
           ctx.strokeStyle = tv.colour; ctx.lineWidth = 0.09; ctx.globalAlpha = 0.9;
           ctx.beginPath(); ctx.arc(cx, cy, 0.62, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
         }
@@ -1131,12 +1182,18 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
     }
     case 'coil': {
       const cx = e.x + 1, cy = e.y + 1;
-      const idle = getSprite('coil-idle'), lit = getSprite('coil-charged');
+      const vn = e.variant && e.variant !== 'coil' ? e.variant : '';
+      const idle = (vn && getSprite(`coil-${vn}-idle`)) || getSprite('coil-idle'), lit = (vn && getSprite(`coil-${vn}-charged`)) || getSprite('coil-charged');
       if (idle && lit) { // the charged picture fades in with a gentle pulse, and flares when the coil fires
         drawSprite(ctx, idle, e.x, e.y);
         const glow = Math.min(1, 0.08 + 0.5 * ((e.charge ?? 0) / COIL_CHARGE_MAX) + Math.sin(time * 3 + e.id) * 0.06 + Math.min(1, e.flash * 3) * 0.85); // brighter as it charges
         ctx.globalAlpha *= Math.max(0, glow);
         drawSprite(ctx, lit, e.x, e.y);
+        if (e.variant === 'shield' && e.charge > 1) { // the field itself: a faint dome the size of its reach
+          ctx.globalAlpha = 0.1 + Math.sin(time * 2 + e.id) * 0.03; ctx.fillStyle = '#7dffb0';
+          ctx.beginPath(); ctx.arc(cx, cy, COIL_VARIANTS.shield.range, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = 0.28; ctx.strokeStyle = '#7dffb0'; ctx.lineWidth = 0.05; ctx.stroke();
+        }
         break;
       }
       const charge = 0.45 + Math.sin(time * 3 + e.id) * 0.12 + Math.min(1, e.flash * 3) * 0.6;
@@ -1223,8 +1280,8 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
       for (const [dx, dy] of [[0.24, 0.5], [0.76, 0.5], [0.5, 0.7]]) { ctx.beginPath(); ctx.arc(e.x + dx, e.y + dy, 0.045, 0, Math.PI * 2); ctx.fill(); }
       break;
     }
-    case 'robotfab': {
-      const spr = getSprite('robot-fab') ?? getSprite('assembler');
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': {
+      const spr = getSprite(e.kind === 'robotfab' ? 'robot-fab' : e.kind) ?? getSprite('robot-fab') ?? getSprite('assembler');
       if (spr) drawSprite(ctx, spr, e.x, e.y);
       else { ctx.fillStyle = '#2f3b4a'; ctx.beginPath(); ctx.roundRect(e.x + 0.06, e.y + 0.06, 2.88, 2.88, 0.2); ctx.fill(); }
       const def = ROBOTS[e.type];
@@ -1242,7 +1299,9 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
       const barW = 2.3, bx = e.x + 0.35, by = e.y + 2.62;
       ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(bx - 0.03, by - 0.03, barW + 0.06, 0.2);
       ctx.fillStyle = '#4aa8ff'; ctx.fillRect(bx, by, barW * Math.min(1, e.progress / def.buildTime), 0.06);
-      ctx.fillStyle = '#e9c46a'; ctx.fillRect(bx, by + 0.08, barW * Math.min(1, e.stock / def.cost), 0.06);
+      let loaded = 1; // how complete the set of plates for the next robot is: the scarcest kind decides
+      for (const k in def.cost) loaded = Math.min(loaded, (e.inv[k as ItemId] ?? 0) / (def.cost[k as ItemId] ?? 1));
+      ctx.fillStyle = '#e9c46a'; ctx.fillRect(bx, by + 0.08, barW * Math.min(1, loaded), 0.06);
       break;
     }
     case 'core': {
@@ -1314,7 +1373,7 @@ export function drawEntity(ctx: CanvasRenderingContext2D, e: Entity, time: numbe
     ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(e.x + 0.2, e.y + e.h - 0.17, e.w - 0.4, 0.14);
     ctx.fillStyle = f >= 0.999 ? '#7fd0ff' : '#3f8fd0'; ctx.fillRect(e.x + 0.23, e.y + e.h - 0.14, (e.w - 0.46) * f, 0.08);
   }
-  if (e.kind === 'robotfab' && world) { // room gauge: one pip for each of its spaces; filled pips are robots it has fielded
+  if (isFab(e) && world) { // room gauge: one pip for each of its spaces; filled pips are robots it has fielded
     const used = fabRoomUsed(world, e.id);
     const pw = (e.w - 0.4) / FAB_CAPACITY;
     ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(e.x + 0.18, e.y - 0.26, e.w - 0.36, 0.24);

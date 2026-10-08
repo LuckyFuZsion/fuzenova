@@ -5,7 +5,8 @@ import { bestLevel, recordWin, starsFor } from '../progress';
 import { generateWorld } from './mapgen';
 import { researchFx } from './research';
 import { Run } from './round';
-import { World } from './world';
+import { World, isFab } from './world';
+import { fabOf } from './robots';
 
 // a tiny in-memory localStorage so the save and progress code can run under Node
 const store = new Map<string, string>();
@@ -23,13 +24,13 @@ const withMods = (id: string): World => {
 };
 
 describe('commanders', () => {
-  it('give every playable commander a real trade-off and lock the ones whose weapon does not exist yet', () => {
+  it('give every playable commander a real trade-off', () => {
     for (const c of COMMANDERS) {
       if (c.locked || c.id === 'wren') { expect(c.mods).toEqual({}); continue; } // the starter and the not-yet-built ones have no modifiers
       const changed = Object.entries(c.mods).filter(([k, v]) => v !== (DEFAULT_MODS as unknown as Record<string, number>)[k]);
       expect(changed.length).toBeGreaterThanOrEqual(2);
     }
-    expect(COMMANDERS.filter((c) => !c.locked).length).toBe(7); // the starter plus six to earn
+    expect(COMMANDERS.filter((c) => !c.locked).length).toBe(9); // the starter plus eight to earn: every commander's weapon now exists
   });
 
   it('change turret strength, capacity and toughness', () => {
@@ -60,9 +61,9 @@ describe('commanders', () => {
     const fab = (id: string, type: 'trooper' | 'heavy') => {
       const w = withMods(id);
       w.research['robot-designs'] = 5; w.rfx = researchFx(w); // every robot design researched
-      const f = w.place('robotfab', 30, 30, 0)!;
-      if (f.kind !== 'robotfab') throw new Error('setup');
-      f.type = type; f.stock = 100;
+      const f = w.place(fabOf(type), 30, 30, 0)!;
+      if (!isFab(f)) throw new Error('setup');
+      f.type = type; f.inv = { 'iron-plate': 400, 'copper-plate': 400, 'tin-plate': 400, 'lead-plate': 400 };
       const run = new Run(w, { buildSeconds: 0, fightSeconds: 600 });
       run.startFight();
       let t = 0;

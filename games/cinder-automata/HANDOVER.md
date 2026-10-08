@@ -23,6 +23,7 @@ Work from `games/cinder-automata` inside the `luckyfuzsion` folder (open **this*
 | Tests | `npx vitest run` (about 200 tests, 30 files, well under a minute) |
 | Type check | `npx tsc --noEmit` |
 | Balance harness | `npx tsx tools/balance.ts 1,3,5,8` (slow above level 8; second argument `r` adds typical research) |
+| Stat sheets (every balance number, as a PDF) | `npm run stats` (writes `docs/Cinder-Automata-Stat-Sheets.pdf`; rerun after any balance change) |
 | Rebuild the design document | `npm run gdd` (writes `docs/Cinder-Automata-Design-Document.pdf` with Edge headless) |
 | Tester zip for people without a server | `npm run tester` (Windows double-click launcher in `release/`) |
 
@@ -41,17 +42,15 @@ Work from `games/cinder-automata` inside the `luckyfuzsion` folder (open **this*
 ## 2. Deploy (this is a static site inside a Next.js repo)
 
 The game builds into `../../public/play/cinder-automata` of the **luckyfuzsion** repo (`https://github.com/LuckyFuZsion/luckyfuzsion`,
-branch `main`; Vercel deploys on push). The game's **source is not in that repo**, only the build. Back the source up separately.
+branch `main`; Vercel deploys on push). The game's **source has its own git repo** (this folder; `.git` lives here, `main` branch). The parent luckyfuzsion repo ignores this folder (`.git/info/exclude`), so the two never mix. Commit source changes here with normal `git add` / `git commit` in `games/cinder-automata`, and push them to the source repo's remote (see below); `npm run deploy` only ever touches the built game folders of the two sites.
 
-1. `node tools/build-sound-manifest.mjs && npx tsc --noEmit && npx vitest run && npx vite build && node tools/build-pwa.mjs`
-2. Delete dev-only files from the build: `public/play/cinder-automata/audio/original`, `.../audio/alt`, `.../sound-test.html`.
-3. Smoke-test the built copy: serve `public/play` with any static server and check the sign-in screen appears and assets load.
-4. From the `luckyfuzsion` repo root, commit **only** `public/play/cinder-automata` (and `lib/streamer-config.ts` if the games list changes). The repo has
-   many unrelated uncommitted files (Crystalbound assets, `tsconfig.json`): never `git add -A` at the root.
-5. `git push origin main`. Check the live page's script name (`assets/index-XXXX.js`) changes to confirm the deploy (about a minute).
+The game is published on **two sites** from one build: `luckyfuzsion` (this repo's `public/play/cinder-automata`, Vercel) and `fuzenova` (the separate repo `../../../fuze-nova-games-website-build`, same folder, `fuzenova.dev`). Each site holds its own copy of the build, so both must be updated together:
 
-The game is a PWA with a cache-first service worker (`tools/sw-template.js`). A visitor's first load after a deploy shows the old version;
-the new service worker then takes over and the game reloads itself on the title screen (or shows a "new version ready" button in play).
+1. `npm run deploy` (dry run): type check, tests, build, strips dev-only files, copies the build into both sites (rewriting the share-card addresses for fuzenova.dev) and lists what changed. Nothing is committed.
+2. `npm run deploy -- --push` (or `node tools/deploy.mjs --push --message="..."`): the same, then commits **only** `public/play/cinder-automata` in each repo and pushes both (`HEAD:main`). Other uncommitted work in either repo is left alone. Both Vercel projects deploy on push (about a minute).
+3. Check the live script name (`assets/index-XXXX.js`) changes on `luckyfuzsion.com/play/cinder-automata/` and on the fuzenova site.
+
+Never `git add -A` at the root of either repo. **Firebase:** `fuzenova.dev` must be listed under Authentication > Settings > Authorised domains in the Firebase console, or sign-in from that site can fail.
 
 ### Accounts and cloud saves (Firebase)
 - Same Firebase project as Crystalbound Saga (`crystalboundsaga`): one login works in both. Web config is in `src/firebase-config.ts` (public client settings).
@@ -116,6 +115,9 @@ Docs: `docs/DESIGN.md`, `docs/PLAN.md`, `docs/gdd/content.ts` (the hand-written 
 - Turrets on one belt share it: a turret does not pull if a turret further down that belt is emptier (in-flight ammunition counts).
 - After a win the map offers/open squares **nearest the core first** (random only within the same ring).
 - The game checks for a new version every 10 minutes and on returning to the window, and shows a reload button; sign-in is kept on the device until sign-out.
+- **Weapons** are three families, each base -> two level-1 -> one level-2 (`sim/turretdata.ts` has every number: `VARIANTS` for turrets, `COIL_VARIANTS` for coils; `sim/turrets.ts` has the upgrade rules). Damage types and enemy weaknesses are in `sim/enemies.ts` (`WEAKNESS`, `typedDamage`): armour only stops kinetic. Flamers are a separate building (`flamer`, needs the `flame-designs` research); fire and burning live in `stepTurrets` and the burn tick in `stepCombat`; Shield/Stun/Railgun in `stepCoils`. Art: all weapons now have their own pictures (raw sheets `art/raw/sheet-torch.jpg`, `sheet-coil-variants.jpg`). The coil pictures have transparent room round the 2x2 base for the prongs, rails and glow, so their `inset` in `src/sprites.ts` is larger than 1 (Railgun 2.76); keep the base square centred if you replace them. The Railgun's rails always point right (a coil does not rotate).
+- **Robots** come from four buildings (`robotfab` = Drone workshop, `hangar`, `foundry`, `heavyworks`; see `FAB_ROBOTS` in `sim/robots.ts`), each from plates (`ROBOTS[t].cost` is a plate recipe, stock lives in `RobotFab.inv`). 12 space per building (Heavy walker 3, Artillery 6, Titan and Carrier 12). Bomber (`bomb`) hits ground enemies in a radius; Carrier (`carries`) launches up to 4 drones that are lost with it. Art: the Hangar, Foundry and Heavy works reuse `robot-depot`, `robot-fab-2` and `robot-fab-3` (copied to `hangar.png`, `foundry.png`, `heavyworks.png`); the Sapper and Carrier have their own art (`robot-top-bomber.png`, `robot-top-carrier.png`, also used as the picker icons `robot-bomber.png`, `robot-carrier.png`; raw sheets `art/raw/sheet-sapper-carrier.jpg` (the Sapper) and `sheet-sapper-carrier-v2.jpg` (the Carrier in use; the first Carrier is in `art/raw/_carrier-v1/`). All top-down robot sprites must face RIGHT (the game rotates them from there); `art/contact/robot-top-all.png` shows the current set.
+- **Underground belts** (`tunnel`, key U): paired 1x1 pieces; the one placed in line behind a free entrance within 5 tiles becomes its exit (`World.tunnelRoleFor`, `tunnelLink`). Up to `TUNNEL_MAX_GAP` = 4 tiles between. They are solid for enemies and need art `tunnel-in.png` / `tunnel-out.png` (a drawn stand-in is used until then).
 - Moving a building (V) empties it (no ammo, items, fuel or charge).
 - Waves: 4 to 9 per fight, each a quick surge from one side; the next wave starts only after the last is dead plus a breather (about 25 s down to 14 s); first wave small, last biggest; later waves lean towards the least-defended edge. "Call next wave" (C) pays plates.
 - The map starts as one 24x24 plot with iron only; after each win the player picks one of three neighbouring plots and the game opens a second. Copper is always next door; forests start two plots out.

@@ -2,3 +2,12 @@ node_modules
 
 # tester builds (npm run tester)
 release/
+
+# made again whenever you want them (npm run gdd, tools/screenshots.mjs), so they are not kept in git
+docs/*.pdf
+docs/gdd/*.html
+docs/prompt-pack.html
+art/contact/
+art/screenshots/
+*.tsbuildinfo
+.claude/settings.local.json

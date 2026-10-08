@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { fabRoomUsed, stepCombat } from './combat';
 import { researchFx } from './research';
-import { ROBOTS } from './robots';
+import { ROBOTS, fabOf } from './robots';
 import { Run } from './round';
-import { World } from './world';
+import { World, isFab } from './world';
 
 function baseWorld(): World {
   const w = new World(100, 100);
@@ -18,11 +18,11 @@ describe('robot soldiers', () => {
     const fab = w.place('robotfab', 40, 40, 0);
     if (fab?.kind !== 'robotfab') throw new Error('fab not placed');
     fab.type = 'drone-1';
-    fab.stock = ROBOTS['drone-1'].cost;
+    fab.inv = { ...ROBOTS['drone-1'].cost };
     for (let i = 0; i < (ROBOTS['drone-1'].buildTime + 1) * 30; i++) stepCombat(w, 1 / 30);
     expect(w.soldiers.length).toBe(1);
     expect(w.soldiers[0].type).toBe('drone-1');
-    expect(fab.stock).toBe(0);
+    expect(Object.values(fab.inv).every((n) => n === 0)).toBe(true); // the plates were used up
   });
 
   it('pulls plates from a belt beside it', () => {
@@ -32,7 +32,7 @@ describe('robot soldiers', () => {
     if (fab?.kind !== 'robotfab' || belt?.kind !== 'belt') throw new Error('setup failed');
     belt.items.push({ type: 'iron-plate', pos: 0.5 });
     for (let i = 0; i < 30; i++) stepCombat(w, 1 / 30);
-    expect(fab.stock).toBe(1);
+    expect(fab.inv['iron-plate']).toBe(1);
     expect(belt.items.length).toBe(0);
   });
 
@@ -60,7 +60,7 @@ describe('robot soldiers', () => {
 
   it('the army survives into the next level, still wounded (robots do not heal)', () => {
     const w = baseWorld();
-    w.soldiers.push({ id: 1, type: 'heavy', x: 50, y: 53, hp: 100, maxHp: 190, cool: 0, face: 1 });
+    w.soldiers.push({ id: 1, type: 'trooper', x: 50, y: 53, hp: 100, maxHp: 190, cool: 0, face: 1 });
     const run = new Run(w, { buildSeconds: 1, fightSeconds: 5 });
     run.startFight();
     run.spawned = run.toSpawn(); w.enemies = []; // the swarm is over (the level is won by the army or otherwise; here we only care what happens next)
@@ -73,15 +73,17 @@ describe('robot soldiers', () => {
 });
 
 describe('fabricator room', () => {
+  const FULL = { 'iron-plate': 400, 'copper-plate': 400, 'tin-plate': 400, 'lead-plate': 400 };
   const built = (type: 'scout' | 'heavy' | 'titan' | 'trooper', plates: number, secs: number) => {
     const w = baseWorld();
     w.research['robot-designs'] = 5; w.rfx = researchFx(w);
-    const f = w.place('robotfab', 30, 30, 0)!;
-    if (f.kind !== 'robotfab') throw new Error('setup');
-    f.type = type; f.stock = plates;
+    const f = w.place(fabOf(type), 30, 30, 0)!;
+    if (!isFab(f)) throw new Error('setup');
+    f.type = type; f.inv = { ...FULL };
     const run = new Run(w, { buildSeconds: 0, fightSeconds: 1000, enemies: false });
     run.startFight();
-    for (let i = 0; i < secs * 30; i++) { f.stock = Math.max(f.stock, plates); run.update(1 / 30); w.enemies = []; }
+    for (let i = 0; i < secs * 30; i++) { f.inv = { ...FULL }; run.update(1 / 30); w.enemies = []; }
+    void plates;
     return { w, f };
   };
 
@@ -95,12 +97,12 @@ describe('fabricator room', () => {
 
   it('builds more when a robot is lost', () => {
     const { w, f } = built('heavy', 100, 400);          // a heavy takes 4: three fit exactly
-    expect(w.soldiers.length).toBe(3);
+    expect(w.soldiers.length).toBe(4);
     w.soldiers.pop();
     const run = new Run(w, { buildSeconds: 0, fightSeconds: 1000, enemies: false });
     run.startFight();
-    for (let i = 0; i < 100 * 30; i++) { f.stock = 100; run.update(1 / 30); w.enemies = []; }
-    expect(w.soldiers.length).toBe(3);
+    for (let i = 0; i < 100 * 30; i++) { f.inv = { ...FULL }; run.update(1 / 30); w.enemies = []; }
+    expect(w.soldiers.length).toBe(4);
   });
 
   it('gives each fabricator its own twelve', () => {
@@ -110,7 +112,7 @@ describe('fabricator room', () => {
     a.type = b.type = 'scout';
     const run = new Run(w, { buildSeconds: 0, fightSeconds: 2000, enemies: false });
     run.startFight();
-    for (let i = 0; i < 600 * 30; i++) { a.stock = b.stock = 50; run.update(1 / 30); w.enemies = []; }
+    for (let i = 0; i < 600 * 30; i++) { a.inv = { ...FULL }; b.inv = { ...FULL }; run.update(1 / 30); w.enemies = []; }
     expect(w.soldiers.length).toBe(24);
   });
 });

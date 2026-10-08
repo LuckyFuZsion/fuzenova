@@ -23,11 +23,26 @@ export interface Mods {
   /** starting plates, and how many resource modules are offered after a level */
   startStock: number;
   moduleChoices: number;
+  /** health of the Core (Workshop upgrades) */
+  coreHp: number;
+  /** artillery, launchers and plasma: burst radius and damage */
+  blastMul: number;
+  blastDmg: number;
+  /** flame and plasma damage (and how hard they burn) */
+  fireDmg: number;
+  /** talents: share of a shot's damage dealt around the target (0 = none), chance to stun, slow strength (0-1) from turret hits and from coil bolts, extra plates per kill, turret reach */
+  splash: number;
+  stunChance: number;
+  slowHit: number;
+  coilSlow: number;
+  killBonus: number;
+  turretRange: number;
 }
 
 export const DEFAULT_MODS: Mods = {
   turretDmg: 1, turretAmmo: 1, defenceHp: 1, robotHp: 1, robotDps: 1, robotSpeed: 1, smallBuildTime: 1, bigBuildTime: 1,
-  coilDmg: 1, coilJumps: 0, coilPower: 1, startStock: 1, moduleChoices: 3,
+  coilDmg: 1, coilJumps: 0, coilPower: 1, startStock: 1, moduleChoices: 3, coreHp: 1, blastMul: 1, blastDmg: 1, fireDmg: 1,
+  splash: 0, stunChance: 0, slowHit: 0, coilSlow: 0, killBonus: 0, turretRange: 1,
 };
 
 export interface Commander {
@@ -83,12 +98,14 @@ export const COMMANDERS: Commander[] = [
     mods: { defenceHp: 1.5, robotSpeed: 0.75 },
   },
   {
-    id: 'ozric', name: 'Marshal Ozric Bellwether', theme: 'Artillery', colour: '#b05a3a', mods: {},
-    bonus: 'Bigger splash and range on artillery shells', drawback: 'Slow to react to fast enemies', locked: 'Needs artillery turrets, which are not built yet',
+    id: 'ozric', name: 'Marshal Ozric Bellwether', theme: 'Artillery', colour: '#b05a3a',
+    bonus: 'Artillery, incendiary launchers and plasma burst 30% wider and hit 25% harder', drawback: 'All turrets hit 10% softer, so the guns do little against fast things up close',
+    mods: { blastMul: 1.3, blastDmg: 1.25, turretDmg: 0.9 },
   },
   {
-    id: 'ysolde', name: 'Cinder Queen Ysolde Ash', theme: 'Fire', colour: '#ff5a3a', mods: {},
-    bonus: 'Flame turrets and burning damage', drawback: 'Short range', locked: 'Needs flame turrets, which are not built yet',
+    id: 'ysolde', name: 'Cinder Queen Ysolde Ash', theme: 'Fire', colour: '#ff5a3a',
+    bonus: 'Flamers, torches, launchers and plasma hit 50% harder, and their fire burns harder too', drawback: 'Storm coils hit 20% softer, and every turret 10% softer',
+    mods: { fireDmg: 1.5, coilDmg: 0.8, turretDmg: 0.9 },
   },
 ];
 

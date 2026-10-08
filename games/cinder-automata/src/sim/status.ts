@@ -1,7 +1,9 @@
 // Spotting things that are placed wrong or cannot work, so the map can show a warning over them instead of leaving
 // the player to work out why nothing moves. Purely a reading of the current layout; it never changes anything.
+import { ROBOTS } from './robots';
+import { BASE_VARIANT, VARIANTS } from './turretdata';
 import { AMMO, CORE_ITEMS, FUEL, ITEMS, ORE_ITEM, RECIPES, SMELTS, type ItemId } from './items';
-import { KINDS, flowsIntoDrill, minerContacts, type Entity, type Miner, type World } from './world';
+import { KINDS, TUNNEL_MAX_GAP, flowsIntoDrill, minerContacts, type Entity, type Miner, type World } from './world';
 
 export interface Problem {
   /** error: it will never work as placed. warn: it is not working yet, but could be. */
@@ -13,10 +15,10 @@ export interface Problem {
 export function willEverAccept(dst: Entity, item: ItemId): boolean {
   switch (dst.kind) {
     case 'belt': case 'core': return true;
-    case 'turret': return !!AMMO[item];
+    case 'turret': case 'flamer': return !!AMMO[item] && VARIANTS[dst.variant ?? BASE_VARIANT[dst.kind]].ammo.includes(item);
     case 'furnace': return !!SMELTS[item];
     case 'assembler': return !!RECIPES[dst.recipe]?.inputs[item];
-    case 'robotfab': return item === 'iron-plate';
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': return (ROBOTS[dst.type].cost[item] ?? 0) > 0;
     case 'generator': return !!FUEL[item];
     case 'scrapbin': return true;
     default: return false;
@@ -68,12 +70,16 @@ export function problemOf(w: World, e: Entity): Problem | null {
     }
     case 'turret':
       return e.ammo <= 0 ? { level: 'warn', text: 'Needs ammo.' } : null;
+    case 'tunnel': {
+      if (e.role === 'in' && !w.tunnelLink(e)) return { level: 'warn', text: `No exit: place another underground piece, facing the same way, in line within ${TUNNEL_MAX_GAP + 1} tiles in front of this one.` };
+      return null;
+    }
     case 'belt': {
       const front = e.items[0];
       if (!front || front.pos < 0.98) return null;
       const next = w.entityAt(e.x + (e.dir === 0 ? 1 : e.dir === 2 ? -1 : 0), e.y + (e.dir === 1 ? 1 : e.dir === 3 ? -1 : 0));
       if (next?.kind === 'core' && !CORE_ITEMS.includes(front.type)) return { level: 'warn', text: `The core refuses ${item(front.type)}: it only takes iron and copper plates and science packs. Smelt or use it before the core.` };
-      if (next && (next.kind === 'core' || next.kind === 'belt' || next.kind === 'junction' || next.kind === 'splitter')) return null;
+      if (next && (next.kind === 'core' || next.kind === 'belt' || next.kind === 'junction' || next.kind === 'splitter' || next.kind === 'tunnel')) return null;
       // turrets and fabricators pull straight off a belt, and inserters lift from it: anything like that counts as a taker
       const takers = neighbours(w, e).filter((n) => n.kind === 'inserter' || ((n.kind === 'turret' || n.kind === 'robotfab') && willEverAccept(n, front.type)));
       if (takers.length) return null;

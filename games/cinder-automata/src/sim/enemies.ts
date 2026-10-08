@@ -28,6 +28,47 @@ export interface EnemyDef {
   insulated?: boolean;
 }
 
+/**
+ * The four kinds of damage. Kinetic (guns, shells) is stopped by flat armour; flame and energy ignore armour; lightning keeps its rule that
+ * insulated machines shrug it off. On top of that, every enemy is weak to some kinds and resists others (see WEAKNESS).
+ */
+export type DamageType = 'kinetic' | 'flame' | 'energy' | 'lightning';
+export const DAMAGE_TYPES: DamageType[] = ['kinetic', 'flame', 'energy', 'lightning'];
+export const DAMAGE_NAMES: Record<DamageType, string> = { kinetic: 'Kinetic', flame: 'Flame', energy: 'Energy', lightning: 'Lightning' };
+
+/** Multipliers on damage of each type, per enemy. Missing means 1. Weak is up to 1.4, resistant down to 0.7: never immune. */
+export const WEAKNESS: Partial<Record<EnemyKind, Partial<Record<DamageType, number>>>> = {
+  'crawler-1': { flame: 1.4 },
+  'crawler-2': { kinetic: 0.9, flame: 1.2, energy: 1.3 },
+  'crawler-3': { flame: 1.1, energy: 1.2 },
+  'spider-1': { flame: 1.3, lightning: 0.85 },
+  'spider-2': { flame: 1.3, lightning: 0.85 },
+  'spider-3': { flame: 1.2, lightning: 0.85, energy: 0.8 },
+  'drone-1': { lightning: 1.4, flame: 0.75 },
+  'drone-2': { lightning: 1.4, flame: 0.75 },
+  'drone-3': { lightning: 1.3, energy: 1.2, flame: 0.75 },
+  'acid-1': { flame: 1.4, lightning: 0.8 },
+  'spitter-1': { flame: 1.4, lightning: 0.8 },
+  'acid-3': { flame: 1.3, lightning: 0.8 },
+  'spitter-3': { flame: 1.3, lightning: 0.8 },
+  'brute-2': { kinetic: 0.85, energy: 1.3, flame: 0.8 },
+  'brute-3': { kinetic: 0.85, energy: 1.3, flame: 0.8 },
+  'boss-colossus': { kinetic: 0.9, energy: 1.25 },
+  'boss-queen': { flame: 1.2, energy: 1.2 },
+};
+export const damageMul = (kind: EnemyKind | undefined, type: DamageType): number => (kind ? WEAKNESS[kind]?.[type] ?? 1 : 1);
+/** Damage types an enemy is clearly weak to (1.15 or more) and clearly resists (0.9 or less). */
+export function weaknessTags(kind: EnemyKind): { weak: DamageType[]; resists: DamageType[] } {
+  return { weak: DAMAGE_TYPES.filter((t) => damageMul(kind, t) >= 1.15), resists: DAMAGE_TYPES.filter((t) => damageMul(kind, t) <= 0.9) };
+}
+/** Damage after armour and weakness. Flat armour only stops kinetic damage; flame and energy ignore it. */
+export function typedDamage(kind: EnemyKind | undefined, dmg: number, type: DamageType): number {
+  const m = damageMul(kind, type);
+  if (type === 'kinetic') return armouredDamage(kind, dmg) * m;
+  if (type === 'lightning') return armouredDamage(kind, dmg, true) * m;
+  return dmg * m;
+}
+
 /** Damage after armour (and insulation, for lightning). */
 export function armouredDamage(kind: EnemyKind | undefined, dmg: number, lightning = false): number {
   const def = kind ? ENEMIES[kind] : undefined;

@@ -20,7 +20,7 @@ export function initControlsPanel(tools: { key: string; kind: Kind }[]): void {
     ${row('W A S D', 'Move the camera')}
     ${row('Wheel', 'Zoom')}
     ${row('Double-click inserter', 'Choose the one item it moves')}
-    ${row('Double-click machine', 'Assembler: recipe. Fabricator: robot. Gun turret: upgrade to Scatter or Sniper')}
+    ${row('Double-click machine', 'Assembler: recipe. Robot building: robot. Gun turret: upgrade to Scatter or Sniper')}
     ${row('H', 'Explain the selected building')}
     ${row('Q', 'Put the building away')}
     ${row('T', 'Research')}

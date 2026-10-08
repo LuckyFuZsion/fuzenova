@@ -65,10 +65,9 @@ export const RECIPE_LIST: Recipe[] = [
   R('science-projectile', 'Projectile science pack', { 'iron-plate': 1, 'copper-plate': 1 }, 'science-projectile', 1, 4),
   R('science-em', 'Electromagnetic science pack', { 'copper-plate': 1, 'tin-plate': 1 }, 'science-em', 1, 5),
   R('science-robotics', 'Robotics science pack', { 'iron-plate': 2, 'lead-plate': 1 }, 'science-robotics', 1, 6),
-  R('science-advanced', 'Advanced science pack', { 'steel-plate': 1, bullet: 1, 'bronze-plate': 1 }, 'science-advanced', 1, 9), // needs the whole ammunition chain
+  R('science-advanced', 'Advanced science pack', { 'steel-plate': 1, bullet: 1 }, 'science-advanced', 1, 9), // level 2: two intermediaries (basic items take 1 ingredient, level 1 takes 2 raw ones, level 2 takes 2 made ones)
   R('gunpowder', 'Gunpowder', { coal: 1, sulfur: 1 }, 'gunpowder', 2, 3),
-  R('bullet-casing', 'Bullet casing', { 'lead-plate': 1, 'copper-plate': 1 }, 'bullet-casing', 2, 2),
-  R('bullet', 'Bullet', { 'bullet-casing': 1, gunpowder: 1 }, 'bullet', 2, 2),
+  R('bullet', 'Bullet', { 'copper-plate': 1, coal: 1 }, 'bullet', 2, 2), // one assembler, two ingredients (the old casing and gunpowder steps are gone)
   R('bronze', 'Bronze', { 'copper-plate': 1, 'tin-plate': 1 }, 'bronze-plate', 2, 3),
   R('steel', 'Steel', { 'iron-plate': 1, charcoal: 1 }, 'steel-plate', 1, 4),
   R('shell-casing', 'Shell casing', { 'steel-plate': 1, 'bronze-plate': 1 }, 'shell-casing', 1, 4),
@@ -79,8 +78,13 @@ export const RECIPES: Record<string, Recipe> = Object.fromEntries(RECIPE_LIST.ma
 /** Seconds of generator running time each fuel item gives. */
 export const FUEL: Partial<Record<ItemId, number>> = { coal: 25, charcoal: 30, wood: 12 };
 
-/** Things a turret can shoot. `shots` per item, and damage per shot. Iron plates are weak "scrap" ammo for the early levels. */
+/** Things a turret can shoot. `shots` per item, and damage per shot. Iron plates are weak "scrap" ammo that the Gun turret and the Scatter gun (a scrap cannon) can use; bullets do real damage. */
 export const AMMO: Partial<Record<ItemId, { shots: number; damage: number }>> = {
   'iron-plate': { shots: 4, damage: 8 },
   bullet: { shots: 10, damage: 20 },
+  // artillery and the fire family: shells, and fuel (a flamer burns through a lot, so each item gives many shots)
+  'artillery-shell': { shots: 3, damage: 70 },
+  coal: { shots: 20, damage: 6 },
+  charcoal: { shots: 26, damage: 8 },
+  wood: { shots: 10, damage: 4 },
 };

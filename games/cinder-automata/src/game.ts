@@ -2,14 +2,15 @@ import { ENEMIES } from './sim/enemies';
 import { problemOf } from './sim/status';
 import { inspectHtml, pickTarget, type Target } from './inspect';
 import type { RangeRing } from './render';
-import { COIL_RANGE, TURRET_RANGE } from './sim/combat';
+import { TURRET_RANGE } from './sim/combat';
+import { BASE_VARIANT, COIL_VARIANTS } from './sim/turretdata';
 import { ResearchPanel } from './researchui';
 import { FilterPicker } from './filterui';
 import { EntityPicker } from './pickerui';
 import { VARIANTS } from './sim/turrets';
 import { recipeUnlocked, robotUnlocked } from './sim/research';
 import { fabRoomUsed } from './sim/combat';
-import { FAB_CAPACITY, ROBOT_SPACE } from './sim/robots';
+import { FAB_CAPACITY, ROBOT_SPACE, plateText } from './sim/robots';
 import { Minimap } from './minimap';
 import { audio, type SfxName } from './audio';
 import { DEFAULT_COMMANDER, commanderById, modsFor, starsForLevel } from './sim/commanders';
@@ -31,7 +32,7 @@ import { addOrePatch, hash } from './sim/mapgen';
 
 const MODULE_RADIUS = 4.2;
 import {
-  ASSEMBLER_OUT_MAX, DX, DY, ITEMS, faceBeltEnds, footprint, opposite, KINDS, createEntity, type Belt, type Dir, type Entity, type Inserter, type ItemId, type Kind, type World,
+  ASSEMBLER_OUT_MAX, isFab, DX, DY, ITEMS, faceBeltEnds, footprint, opposite, KINDS, createEntity, type Belt, type Dir, type Entity, type Inserter, type ItemId, type Kind, type World,
 } from './sim/world';
 import { POLE_REACH, POLE_SUPPLY } from './sim/power';
 import { render, type Camera } from './render';
@@ -41,13 +42,17 @@ import { TUTORIAL_PATCH, TUTORIAL_STEPS } from './tutorial';
 import { TOOL_HELP, loadSeen, saveSeen } from './toolhelp';
 import { itemIconUrl, loadSprites } from './sprites';
 import { Discoveries } from './discoveries';
+import { awardRun, withPerks } from './prestige';
 
 const STEP = 1 / 60;
+/** Buildings that have to be researched before they can be placed. */
+const toolLocked = (w: World, k: Kind): boolean => k === 'flamer' && !w.freeBuild && levelOf(w, 'flame-designs') < 1;
 /** The build bar, in groups. Keys stay fixed per building whatever order they are shown in. */
 const TOOL_GROUPS: { name: string; tools: { kind: Kind; key: string }[] }[] = [
-  { name: 'Logistics', tools: [{ kind: 'belt', key: '1' }, { kind: 'inserter', key: '2' }, { kind: 'junction', key: 'j' }, { kind: 'splitter', key: 'k' }] },
-  { name: 'Production', tools: [{ kind: 'miner', key: '3' }, { kind: 'furnace', key: '4' }, { kind: 'assembler', key: '9' }, { kind: 'robotfab', key: '7' }, { kind: 'scrapbin', key: 'b' }] },
-  { name: 'Defence', tools: [{ kind: 'turret', key: '6' }, { kind: 'wall', key: '8' }, { kind: 'coil', key: '=' }] },
+  { name: 'Logistics', tools: [{ kind: 'belt', key: '1' }, { kind: 'inserter', key: '2' }, { kind: 'junction', key: 'j' }, { kind: 'splitter', key: 'k' }, { kind: 'tunnel', key: 'u' }] },
+  { name: 'Production', tools: [{ kind: 'miner', key: '3' }, { kind: 'furnace', key: '4' }, { kind: 'assembler', key: '9' }, { kind: 'scrapbin', key: 'b' }] },
+  { name: 'Robots', tools: [{ kind: 'robotfab', key: '7' }, { kind: 'hangar', key: 'g' }, { kind: 'foundry', key: 'l' }, { kind: 'heavyworks', key: 'y' }] },
+  { name: 'Defence', tools: [{ kind: 'turret', key: '6' }, { kind: 'flamer', key: 'o' }, { kind: 'wall', key: '8' }, { kind: 'coil', key: '=' }] },
   { name: 'Power', tools: [{ kind: 'pole', key: '0' }, { kind: 'generator', key: '-' }] },
 ];
 export const TOOLS = TOOL_GROUPS.flatMap((g) => g.tools);
@@ -60,7 +65,7 @@ const clock = (s: number): string => `${Math.floor(Math.max(0, s) / 60)}:${Strin
 /** A fresh run. For quick play-testing add ?build=20&fight=60 (seconds) to the page address. */
 function newRun(tutorial = false, commander = DEFAULT_COMMANDER, difficulty: string = DEFAULT_DIFFICULTY): Run {
   const world = generateWorld(tutorial ? undefined : randomSeed());
-  if (!tutorial) world.mods = modsFor(commanderById(commander));
+  if (!tutorial) world.mods = withPerks(modsFor(commanderById(commander)), commanderById(commander).id);
   world.place('core', tutorial ? LEGACY_CORE.x : CORE_TILE.x, tutorial ? LEGACY_CORE.y : CORE_TILE.y, 0);
   if (tutorial) {
     // a small, generous iron patch close to the core, an untimed build phase and a short, gentle fight
@@ -121,7 +126,10 @@ export class Game {
   /** Fast-forward: 1, 2 or 4 simulation steps per frame. F cycles it; the speed buttons set it; it drops back to 1 when a level ends. */
   speed = 1;
 
-  setSpeed(s: number): void {
+  /** The speed to go back to when a quiet gap between waves ends (set only when the game slowed itself down for that gap). */
+  private resumeSpeed = 0;
+  setSpeed(s: number, auto = false): void {
+    if (!auto) this.resumeSpeed = 0; // a choice made by the player stands
     this.speed = s;
     document.querySelectorAll('#speed button').forEach((b) => b.classList.toggle('on', Number((b as HTMLElement).dataset.speed) === s));
   }
@@ -129,8 +137,8 @@ export class Game {
   /** The reach of one building, as a circle: gun turrets, Storm coils and the area a power pole supplies. */
   private ringFor(e: Entity, faint = false): RangeRing | null {
     const x = e.x + e.w / 2, y = e.y + e.h / 2, fx = this.world.rfx;
-    if (e.kind === 'turret') return { x, y, r: VARIANTS[e.variant ?? 'gun'].range * fx.turretRange, color: 'amber', faint };
-    if (e.kind === 'coil') return { x, y, r: COIL_RANGE * fx.coilRange, color: 'blue', faint };
+    if (e.kind === 'turret' || e.kind === 'flamer') return { x, y, r: VARIANTS[e.variant ?? BASE_VARIANT[e.kind]].range * fx.turretRange, color: e.kind === 'flamer' ? 'amber' : 'amber', faint };
+    if (e.kind === 'coil') return { x, y, r: COIL_VARIANTS[e.variant ?? 'coil'].range * fx.coilRange, color: 'blue', faint };
     if (e.kind === 'pole') return { x, y, r: POLE_SUPPLY, color: 'teal', faint };
     return null;
   }
@@ -140,7 +148,7 @@ export class Game {
     const out: RangeRing[] = [];
     if (this.moving) return out;
     const tool = this.tool;
-    if (tool === 'turret' || tool === 'coil' || tool === 'pole') {
+    if (tool === 'turret' || tool === 'flamer' || tool === 'coil' || tool === 'pole') {
       for (const e of this.world.entities.values()) if (e.kind === tool) { const r = this.ringFor(e, true); if (r) out.push(r); }
       if (ghost) { const s = KINDS[tool]; const r = this.ringFor({ ...createEntity(tool, 0, ghost.x, ghost.y, 0), w: s.w, h: s.h } as Entity); if (r) out.push(r); }
     } else if (hovered) {
@@ -258,6 +266,8 @@ export class Game {
 
   /** Throws the save away and starts fresh (New game). */
   newGame(commander = DEFAULT_COMMANDER, difficulty: string = DEFAULT_DIFFICULTY): void {
+    const old = loadSave(); // a run that is left behind still pays out for the levels it got through
+    if (old && old.level > 1 && this.tutorialStep === null) { const n = awardRun(old.level - 1, old.difficulty, old.commander, 'left'); if (n > 0) this.say(`Your last run reached level ${old.level}: +${n} Embers for the Workshop`); }
     clearSave();
     this.commander = commanderById(commander).id;
     this.run = newRun(false, this.commander, difficulty);
@@ -267,6 +277,8 @@ export class Game {
   }
 
   private lastPhase = 'build';
+  /** Embers paid out for the run that just ended */
+  private reward = 0;
   private saveTimer = 0;
   private flash = { text: '', until: 0 };
 
@@ -470,7 +482,7 @@ export class Game {
         b.setAttribute('aria-label', KINDS[t.kind].name);
         b.append(kindIcon(t.kind, 96));
         const label = document.createElement('span');
-        const short = KINDS[t.kind].name.replace('Ember ', '').replace('Conveyor ', '').replace('Gun ', '').replace('Storage ', '').replace('Robot fabricator', 'Robots').replace('Mining drill', 'Drill');
+        const short = KINDS[t.kind].name.replace('Ember ', '').replace('Conveyor ', '').replace('Gun ', '').replace('Storage ', '').replace('Drone workshop', 'Workshop').replace('Gunship hangar', 'Hangar').replace('Walker foundry', 'Foundry').replace('Heavy works', 'Heavy').replace('Mining drill', 'Drill');
         label.textContent = short.charAt(0).toUpperCase() + short.slice(1);
         const cost = document.createElement('small');
         cost.className = 'cost';
@@ -539,7 +551,7 @@ export class Game {
       this.updateMouse(e);
       const t = this.hoverTile;
       const ins = t ? this.world.entityAt(t.x, t.y) : undefined;
-      if (ins?.kind === 'assembler' || ins?.kind === 'robotfab' || ins?.kind === 'turret') { this.painting = false; this.entityPicker.open(ins, this.mouse.sx, this.mouse.sy); return; }
+      if (ins?.kind === 'assembler' || (ins && isFab(ins)) || ins?.kind === 'turret' || ins?.kind === 'flamer' || ins?.kind === 'coil') { this.painting = false; this.entityPicker.open(ins, this.mouse.sx, this.mouse.sy); return; }
       if (ins?.kind !== 'inserter') return;
       const passing = new Set<ItemId>(); // what is on the belts beside it right now, offered first
       for (const d of [0, 1, 2, 3] as Dir[]) {
@@ -731,7 +743,10 @@ export class Game {
     this.resultEl.classList.remove('plots');
     w.openPlot(id);
     const rest = plotCandidates(w.plots!);
-    const extra = rest.length ? nearestFirst(rest, () => Math.random())[0] : -1; // the bonus square is also the nearest available
+    const offered = new Set(w.plotOffer);
+    const fresh2 = rest.filter((p) => !offered.has(p)); // the bonus square is a surprise: not one of the squares that were just on offer, unless there is nothing else
+    const pool = fresh2.length ? fresh2 : rest;
+    const extra = pool.length ? nearestFirst(pool, () => Math.random())[0] : -1; // still the nearest of those, so the land fills in without gaps
     if (extra >= 0) w.openPlot(extra);
     w.plotOffer = []; w.plotHover = -1;
     const fresh = [...knownOres(w)].filter((k) => !before.has(k));
@@ -794,6 +809,7 @@ export class Game {
   /** Places a building if the tile is free and the core can pay. Turning an existing belt round is free. */
   private tryPlace(kind: Kind, x: number, y: number, dir: Dir): void {
     const w = this.world;
+    if (toolLocked(w, kind)) { this.say('Research Flame designs (T) to unlock the Flamer', true); return; }
     const reorient = kind === 'belt' && w.entityAt(x, y)?.kind === 'belt';
     if (!reorient) {
       if (!w.canPlace(kind, x, y, dir)) return;
@@ -803,7 +819,7 @@ export class Game {
     const placed = w.place(kind, x, y, dir);
     if (placed && !reorient) {
       spend(w, kind);
-      const flat = kind === 'belt' || kind === 'inserter' || kind === 'junction' || kind === 'splitter';
+      const flat = kind === 'belt' || kind === 'inserter' || kind === 'junction' || kind === 'splitter' || kind === 'tunnel';
       audio.play(flat ? 'place-belt' : 'place-building', { volume: flat ? 0.6 : 0.9, minGap: flat ? 45 : 0 });
       if (this.run.phase === 'build') placed.fresh = true;
       evictUnits(w, placed); // anything standing where it went is moved out, never trapped inside
@@ -877,6 +893,10 @@ export class Game {
 
     this.pauseEl.hidden = !(this.paused && this.started && !this.menu.isOpen && !this.discoveries.open);
     if (!this.paused && !this.menu.isOpen && this.started) {
+      // the quiet gap between waves always runs at normal speed, so there is time to build and to call the next wave early; fast-forward resumes with the next wave
+      const quiet = this.run.phase === 'fight' && this.world.enemies.length === 0 && this.run.waveInfo().breather !== null;
+      if (quiet && this.speed > 1 && !this.resumeSpeed) { this.resumeSpeed = this.speed; this.setSpeed(1, true); }
+      else if (!quiet && this.resumeSpeed) { const back = this.resumeSpeed; this.resumeSpeed = 0; if (this.speed === 1) this.setSpeed(back, true); }
       this.acc += dt * this.speed;
       let n = 0;
       const cap = 5 * this.speed;
@@ -887,7 +907,7 @@ export class Game {
     if (this.run.finishedResearch) { // a research has just finished
       const t = techById(this.run.finishedResearch);
       this.run.finishedResearch = null;
-      if (t) { this.flash = { text: `Research complete: ${t.name} level ${levelOf(this.world, t.id)}${t.id === 'turret-designs' ? ' - double-click a gun turret to upgrade it' : ''}`, until: performance.now() + (t.id === 'turret-designs' ? 9000 : 5000) }; audio.play('ui-star', { volume: 0.7, pitchVar: 0 }); }
+      if (t) { this.flash = { text: `Research complete: ${t.name} level ${levelOf(this.world, t.id)}${t.id === 'turret-designs' ? ' - double-click a gun turret to upgrade it' : t.id === 'flame-designs' ? ' - build a Flamer from the Defence group, and double-click it to upgrade' : t.id === 'coil-designs' ? ' - double-click a Storm coil to upgrade it' : ''}`, until: performance.now() + (t.id === 'turret-designs' || t.id === 'flame-designs' || t.id === 'coil-designs' ? 9000 : 5000) }; audio.play('ui-star', { volume: 0.7, pitchVar: 0 }); }
     }
 
     const t = this.hoverTile && this.mouse.inside ? this.hoverTile : null;
@@ -939,7 +959,7 @@ export class Game {
     this.statsEl.innerHTML = `<h3>Core stock <span class="hint" title="Buildings and research are paid for from here. Send plates and science packs into the core on a belt, or with an inserter, to top it up. Kills and finished levels pay too.">?</span></h3>${stockRows}` +
       `${free ? '<div class="note">Building is free in the tutorial</div>' : ''}${this.paused && !this.discoveries.open ? '<div class="paused">PAUSED (P)</div>' : ''}`;
     // dim the build-bar buttons for things the core can't afford right now
-    this.barEl.querySelectorAll<HTMLElement>('button[data-kind]').forEach((b) => b.classList.toggle('poor', !canAfford(this.world, b.dataset.kind as Kind)));
+    this.barEl.querySelectorAll<HTMLElement>('button[data-kind]').forEach((b) => { b.classList.toggle('poor', !canAfford(this.world, b.dataset.kind as Kind)); b.classList.toggle('locked', toolLocked(this.world, b.dataset.kind as Kind)); });
 
     this.updateRoundUi();
     this.updateTutorial();
@@ -947,7 +967,7 @@ export class Game {
     // autosave at the start of every build phase, every so often while building, and never after a loss
     if (this.run.phase !== this.lastPhase) {
       if (this.run.phase === 'build') this.autosave();
-      if (this.run.phase === 'lost' && this.tutorialStep === null) clearSave();
+      if (this.run.phase === 'lost' && this.tutorialStep === null) { this.reward = awardRun(this.run.level - 1, this.run.difficulty.id, this.commander, 'lost'); clearSave(); } // every run pays out by how far it got
       this.lastPhase = this.run.phase;
     }
     this.saveTimer += 0.25;
@@ -1055,7 +1075,7 @@ const hi = (n: string, t: string) => `<img class="hi" src="${import.meta.env.BAS
         if (r.phase === 'won' && r.level >= 30 && this.tutorialStep === null) set('resultTitle', r.level === 30 ? 'Level 30 complete - Victory!' : `Endless: level ${r.level} complete`);
         set('resultText', r.phase === 'won'
           ? `${this.world.kills} enemies destroyed. The core patches itself up a little before the next build phase.${starNote}${endless}`
-          : `You held out to level ${r.level}.${r.level > 30 ? ' A fine Endless run.' : ''}`);
+          : `You held out to level ${r.level}.${r.level > 30 ? ' A fine Endless run.' : ''}${this.reward > 0 ? ` You earned ${this.reward} Embers for the Workshop on the title screen.` : ''}`);
         set('resultBtn', r.phase === 'won' ? `Start level ${r.level + 1}` : 'Try again');
         const pickModule = r.phase === 'won' && this.tutorialStep === null;
         if (pickModule) {
@@ -1082,6 +1102,11 @@ function describe(e: Entity, w: World): string {
 function describeBase(e: Entity, w: World): string {
   switch (e.kind) {
     case 'belt': return `<b>Conveyor belt</b> - ${e.items.length} item(s)`;
+    case 'tunnel': {
+      const link = e.role === 'in' ? w.tunnelLink(e) : undefined;
+      const where = e.role === 'in' ? (link ? `goes under ${link.k - 1} tile(s) to its exit` : 'no exit in range yet') : 'the exit: items come out of the front';
+      return `<b>Underground belt (${e.role === 'in' ? 'entrance' : 'exit'})</b> facing ${DIR_NAMES[e.dir]} - ${where}. ${e.items.length} item(s)`;
+    }
     case 'junction': return `<b>Crossover</b> - lets one belt cross another. ${e.lanes.reduce((n, l) => n + l.length, 0)} item(s) passing through`;
     case 'splitter': return `<b>Splitter / merger</b> facing ${DIR_NAMES[e.dir]} - ${e.items.length} item(s). Belts feed it from behind; it hands items to the two tiles in front, taking turns`;
     case 'miner': {
@@ -1090,8 +1115,10 @@ function describeBase(e: Entity, w: World): string {
     case 'inserter': return `<b>Inserter</b> - ${e.held ? `carrying ${ITEMS[e.held].name}` : 'idle'}. ${e.filter ? `Moves only <b>${ITEMS[e.filter].name}</b>` : 'Moves any item'} (double-click it to choose)`;
     case 'furnace':
       return `<b>Smelter</b> - in: ${e.inCount}x ${e.inType ? ITEMS[e.inType].name : 'nothing'}, out: ${e.outCount}x ${e.outType ? ITEMS[e.outType].name : 'nothing'}`;
-    case 'turret':
-      return `<b>Gun turret</b> - ${e.ammo} shots loaded. Feed it iron plates (weak) or bullets (strong) on a belt touching it.`;
+    case 'turret': case 'flamer': {
+      const v = VARIANTS[e.variant ?? BASE_VARIANT[e.kind]];
+      return `<b>${v.name}</b> - ${e.ammo} shots loaded. Feed it ${v.ammo.map((i) => ITEMS[i].name.toLowerCase()).join(', ')} on a belt touching it. ${v.tier < 2 ? 'Double-click to upgrade it.' : ''}`;
+    }
     case 'assembler': {
       const r = RECIPES[e.recipe];
       const need = Object.entries(r.inputs).map(([k, n]) => `${n}x ${ITEMS[k as ItemId].name}`).join(' + ');
@@ -1108,15 +1135,17 @@ function describeBase(e: Entity, w: World): string {
     case 'coil': {
       const net = w.power?.netOf.get(e.id);
       const sat = net === undefined ? 0 : w.power!.sat.get(net) ?? 0;
-      return `<b>Storm coil</b> - ${net === undefined ? '<span class="warn">not connected to a power pole</span>' : `power ${Math.round(sat * 100)}%${sat < 0.15 ? ' <span class="warn">(no fuel burning?)</span>' : ''}`}. Chain lightning, no ammo needed.`;
+      const cd = COIL_VARIANTS[e.variant ?? 'coil'];
+      return `<b>${cd.name}</b> - ${net === undefined ? '<span class="warn">not connected to a power pole</span>' : `power ${Math.round(sat * 100)}%${sat < 0.15 ? ' <span class="warn">(no fuel burning?)</span>' : ''}`}. ${cd.blurb.split('. ')[0]}. Charge ${Math.round(e.charge ?? 0)}.${cd.tier < 2 ? ' Double-click to upgrade it.' : ''}`;
     }
     case 'wall': return `<b>Wall</b> - ${Math.round(e.hp)} / ${e.maxHp}. Enemies attack walls before other buildings, which buys your turrets time.`;
     case 'core':
       return `<b>Cinder Core</b> - ${Math.round(e.hp)} / ${e.maxHp}. Keep it alive. It only takes iron and copper plates and science packs.`;
-    case 'robotfab': {
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': {
       const d = ROBOTS[e.type];
       const used = fabRoomUsed(w, e.id);
-      return `<b>Robot fabricator</b> - builds <b>${d.name}</b> (${d.cost} iron plates, ${d.buildTime}s, takes ${ROBOT_SPACE[e.type]} space). Army room ${used} of ${FAB_CAPACITY}${used + ROBOT_SPACE[e.type] > FAB_CAPACITY ? ' - FULL for this robot' : ''}. ${e.stock}/${d.cost} plates loaded. Click it to change robot.`;
+      const have = Object.entries(d.cost).map(([k, n]) => `${ITEMS[k as ItemId].name.replace(' plate', '')} ${Math.min(n as number, e.inv[k as ItemId] ?? 0)}/${n}`).join(', ');
+      return `<b>${KINDS[e.kind].name}</b> - builds <b>${d.name}</b> (${plateText(d.cost)}, ${d.buildTime}s, takes ${ROBOT_SPACE[e.type]} space). Army room ${used} of ${FAB_CAPACITY}${used + ROBOT_SPACE[e.type] > FAB_CAPACITY ? ' - FULL for this robot' : ''}. Loaded: ${have}. Double-click it to change robot.`;
     }
   }
 }

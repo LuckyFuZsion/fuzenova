@@ -6,6 +6,8 @@ import { showAuth, showVerify } from './authui';
 import { pickCommander } from './commanderui';
 import { initControlsPanel } from './controlspanel';
 import { audio } from './audio';
+import { embers } from './prestige';
+import { openWorkshop } from './workshopui';
 import { TOOLS } from './game';
 
 interface FuzeNovaIntroApi {
@@ -143,6 +145,10 @@ document.getElementById('start')!.addEventListener('click', async () => {
 });
 continueBtn.addEventListener('click', () => enter('continue'));
 document.getElementById('tut')!.addEventListener('click', () => enter('tutorial'));
+const workshopBtn = document.getElementById('workshop-btn')!;
+const refreshWorkshop = (): void => { const n = embers(); workshopBtn.textContent = n > 0 ? `Workshop (${n} Embers)` : 'Workshop'; };
+workshopBtn.addEventListener('click', () => openWorkshop(refreshWorkshop));
+refreshWorkshop();
 initControlsPanel(TOOLS);
 
 // Menu music: browsers only allow sound after the first click or key press, so it starts then and carries on through

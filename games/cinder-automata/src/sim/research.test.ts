@@ -119,7 +119,7 @@ describe('what research unlocks', () => {
     const w = rich();
     const f = w.place('robotfab', 30, 30, 0)!;
     if (f.kind !== 'robotfab') throw new Error('setup');
-    f.type = 'titan'; f.stock = 100;
+    f.type = 'titan'; f.inv = { 'iron-plate': 100, 'copper-plate': 100 };
     const run = new Run(w, { buildSeconds: 0, fightSeconds: 600 });
     run.startFight();
     for (let i = 0; i < 30; i++) run.update(1 / 30);

@@ -70,7 +70,7 @@ export const TUTORIAL_STEPS: Step[] = [
   },
   {
     title: 'Hold the line',
-    html: 'Watch the belt carry plates to your turret: the dots around its rim show its ammo. Anything can still be fixed or added mid-fight. Survive until the timer ends and the last enemy falls. Tip: more turrets, or a <b>Robot fabricator</b> (<kbd>7</kbd>) fed with plates, make a stronger defence.',
+    html: 'Watch the belt carry plates to your turret: the dots around its rim show its ammo. Anything can still be fixed or added mid-fight. Survive until the timer ends and the last enemy falls. Tip: more turrets, or a <b>Drone workshop</b> (<kbd>7</kbd>) fed with copper and iron plates to build robots, make a stronger defence. Later you can build the Gunship hangar, Walker foundry and Heavy works for stronger robots.',
     done: ({ run }) => run.phase === 'won' || run.phase === 'lost',
   },
   {

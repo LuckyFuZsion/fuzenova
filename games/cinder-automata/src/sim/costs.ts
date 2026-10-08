@@ -14,9 +14,15 @@ export const COSTS: Record<Kind, Cost> = {
   turret: { 'iron-plate': 30, 'copper-plate': 5 },
   assembler: { 'iron-plate': 40, 'copper-plate': 10 },
   robotfab: { 'iron-plate': 60, 'copper-plate': 20 },
+  // the Core only holds iron and copper plates, so buildings are paid for in those; the tin and lead come in later, as ingredients for the robots
+  hangar: { 'iron-plate': 80, 'copper-plate': 35 },
+  foundry: { 'iron-plate': 80, 'copper-plate': 35 },
+  heavyworks: { 'iron-plate': 130, 'copper-plate': 60 },
   pole: { 'iron-plate': 2, 'copper-plate': 1 },
   generator: { 'iron-plate': 40, 'copper-plate': 10 },
   scrapbin: { 'iron-plate': 20 },
+  flamer: { 'iron-plate': 40, 'copper-plate': 15 },
+  tunnel: { 'iron-plate': 8 },
   coil: { 'iron-plate': 50, 'copper-plate': 30 },
   junction: {},
   splitter: {},
@@ -28,7 +34,7 @@ export const START_STOCK: Cost = { 'iron-plate': 170, 'copper-plate': 45 };
 /** Fraction of the cost handed back when you take a building down. */
 export const REFUND = 0.75;
 /** Belts and inserters are re-laid constantly while you tune a factory, so taking them down loses nothing. */
-export const FREE_TO_REMOVE: Kind[] = ['belt', 'inserter', 'junction', 'splitter'];
+export const FREE_TO_REMOVE: Kind[] = ['belt', 'inserter', 'junction', 'splitter', 'tunnel'];
 export const KILL_REWARD: Cost = { 'iron-plate': 2 };
 export const LEVEL_REWARD: Cost = { 'iron-plate': 30, 'copper-plate': 8 };
 

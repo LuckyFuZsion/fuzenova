@@ -27,7 +27,7 @@ function line(recipe: string, feed: Partial<Record<ItemId, number>>) {
 describe('ammo chain', () => {
   it('has the recipes that were designed', () => {
     const ids = RECIPE_LIST.map((r) => r.id);
-    for (const id of ['gunpowder', 'bullet-casing', 'bullet', 'bronze', 'steel', 'shell-casing', 'artillery-shell']) expect(ids).toContain(id);
+    for (const id of ['gunpowder', 'bullet', 'bronze', 'steel', 'shell-casing', 'artillery-shell']) expect(ids).toContain(id);
   });
 
   it('an assembler turns two inputs into gunpowder and an inserter carries it out', () => {

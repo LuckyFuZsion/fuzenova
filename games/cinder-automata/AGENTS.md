@@ -7,7 +7,7 @@ Browser factory + defence roguelite. TypeScript, Vite, Canvas 2D, no game engine
 - Before finishing any change run `npx tsc --noEmit` and `npx vitest run`. Both must pass.
 - The simulation (`src/sim/*`) is headless and deterministic-ish; put game rules there and cover them with a vitest test next to it. Rendering and UI live outside `src/sim`.
 - Update the changelog in `docs/gdd/content.ts` for every player-visible change, then `npm run gdd` to rebuild the PDF. Keep `HANDOVER.md` current when a rule changes.
-- Do **not** commit, push or deploy unless the owner asks. Deploying = the steps in `HANDOVER.md` section 2; commit only `public/play/cinder-automata` in the `luckyfuzsion` repo, never `git add -A` at its root.
+- Do **not** commit, push or deploy unless the owner asks. Deploying = `npm run deploy` (dry run) then `npm run deploy -- --push`: the game is published to BOTH the luckyfuzsion and fuzenova sites together (see `HANDOVER.md` section 2); only `public/play/cinder-automata` is ever committed in each repo, never `git add -A`.
 - Do not create accounts on the live Firebase project. Publish game build first, then `firestore.rules`.
 
 ## Practical

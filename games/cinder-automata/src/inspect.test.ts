@@ -21,11 +21,11 @@ describe('inspect mode', () => {
     const w = new World(40, 40);
     const a = w.place('assembler', 5, 5, 0)!;
     if (a.kind !== 'assembler') throw new Error('setup');
-    a.recipe = 'bullet-casing';
-    a.stock = { 'lead-plate': 1 };
+    a.recipe = 'bullet';
+    a.stock = { coal: 1 };
     const html = inspectHtml({ t: 'entity', e: a }, w);
-    expect(html).toContain('Bullet casing');
-    expect(html).toContain('lead plate: has 1');
+    expect(html).toContain('Bullet');
+    expect(html).toContain('coal: has 1');
     expect(html).toContain('copper plate: has 0');
   });
 

@@ -2,6 +2,8 @@
 import { COMMANDERS, DEFAULT_COMMANDER, type Commander } from './sim/commanders';
 import { achievementFor } from './sim/achievements';
 import { DIFFICULTIES, type Difficulty } from './sim/difficulty';
+import { TALENTS, TALENT_SLOTS, talentById, owns } from './sim/talents';
+import { loadPrestige, setTalentSlot, talentsOf } from './prestige';
 import { bestLevel, isUnlocked, lastCommander, lastDifficulty, rememberCommander, rememberDifficulty, starsFor } from './progress';
 
 const esc = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -25,6 +27,18 @@ function emblem(c: Commander, isOpen: boolean): string {
     <img class="cs-portrait${isOpen ? '' : ' dark'}" src="${portrait}" alt="" onload="this.parentElement.classList.add('has-portrait')" onerror="this.remove()">
     ${isOpen ? '' : `<span class="cs-lock">${LOCK}</span>`}
   </div>`;
+}
+
+/** The commander's three talent slots: each is a drop-down of the talents the player owns. */
+function talentHtml(id: string): string {
+  const s = loadPrestige(), state = { unlocked: s.unlocked ?? [], loadout: s.loadout ?? {} };
+  const worn = talentsOf(id), owned = TALENTS.filter((t) => owns(t, state));
+  const slots = Array.from({ length: TALENT_SLOTS }, (_, i) => {
+    const cur = worn[i] ?? '';
+    return `<label class="cs-tal" title="${esc(talentById(cur)?.blurb ?? 'Empty slot')}">      <select data-slot="${i}" data-cmd="${id}"><option value="">(empty)</option>${owned.map((t) => `<option value="${t.id}"${t.id === cur ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
+      <em>${esc(talentById(cur)?.blurb ?? '')}</em></label>`;
+  }).join('');
+  return `<div class="cs-tals"><h5>Talents</h5>${slots}</div>`;
 }
 
 function difficultyTile(d: Difficulty, index: number, on: boolean): string {
@@ -61,6 +75,7 @@ export function pickCommander(): Promise<NewGameChoice | null> {
           <li class="up"><span>+</span>${esc(c.bonus)}</li>
           <li class="down"><span>&minus;</span>${esc(c.drawback)}</li>
         </ul>
+        ${isOpen ? talentHtml(c.id) : ''}
         <div class="cs-foot">${isOpen ? (best ? `Best: level ${best}${best >= 30 ? ' (endless)' : ''}` : 'Not played yet') : `<span class="cs-hint">${lock}</span>`}</div>
       </article>`;
     };
@@ -101,7 +116,7 @@ export function pickCommander(): Promise<NewGameChoice | null> {
     layout();
 
     const done = (r: NewGameChoice | null) => {
-      el.hidden = true; el.onclick = null; window.removeEventListener('keydown', onKey, true); resolve(r);
+      el.hidden = true; el.onclick = null; el.onchange = null; window.removeEventListener('keydown', onKey, true); resolve(r);
     };
     const start = () => { const c = list[focus]; if (!open(c.id)) return; rememberCommander(c.id); done({ commander: c.id, difficulty }); };
     const onKey = (e: KeyboardEvent) => {
@@ -114,6 +129,13 @@ export function pickCommander(): Promise<NewGameChoice | null> {
     };
     window.addEventListener('keydown', onKey, true);
 
+    el.onchange = (e) => {
+      const sel = e.target as HTMLSelectElement;
+      if (!sel.dataset.slot) return;
+      setTalentSlot(sel.dataset.cmd!, Number(sel.dataset.slot), sel.value || null);
+      const card = sel.closest('.cs-card')!, holder = card.querySelector('.cs-tals');
+      if (holder) holder.outerHTML = talentHtml(sel.dataset.cmd!); // other slots may have changed places
+    };
     el.onclick = (e) => {
       const t = e.target as HTMLElement;
       if (t.closest('#cback')) return done(null);

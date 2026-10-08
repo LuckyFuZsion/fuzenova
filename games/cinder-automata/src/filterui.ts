@@ -6,7 +6,7 @@ import { itemIconUrl } from './sprites';
 const GROUPS: { name: string; items: ItemId[] }[] = [
   { name: 'Raw', items: ['iron-ore', 'copper-ore', 'tin-ore', 'lead-ore', 'coal', 'sulfur', 'wood'] },
   { name: 'Plates and materials', items: ['iron-plate', 'copper-plate', 'tin-plate', 'lead-plate', 'steel-plate', 'bronze-plate', 'charcoal'] },
-  { name: 'Ammunition and parts', items: ['gunpowder', 'bullet-casing', 'bullet', 'shell-casing', 'artillery-shell'] },
+  { name: 'Ammunition and parts', items: ['gunpowder', 'bullet', 'shell-casing', 'artillery-shell'] },
   { name: 'Science', items: ['science-projectile', 'science-em', 'science-robotics'] },
 ];
 

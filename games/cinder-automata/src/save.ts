@@ -1,6 +1,7 @@
 // Save and resume. The run is saved at the start of each build phase (and when the tab is hidden or closed during
 // one), so you can leave between levels and pick up exactly where you were. Stored in this browser only.
 import { markDirty } from './cloud';
+import { withPerks } from './prestige';
 import { commanderById, modsFor } from './sim/commanders';
 import type { DifficultyId } from './sim/difficulty';
 import { LEGACY_SEED, generateWorld } from './sim/mapgen';
@@ -38,7 +39,7 @@ export function clearSave(): void {
 /** Rebuilds a run from a save, in its build phase with a fresh timer. */
 export function restoreRun(save: SaveData, opts: RunOptions = {}): Run {
   const world = generateWorld(save.seed ?? LEGACY_SEED); // saves from before run seeds were the original fixed map
-  world.mods = modsFor(commanderById(save.commander));
+  world.mods = withPerks(modsFor(commanderById(save.commander)), commanderById(save.commander).id);
   world.importState(save.world);
   world.freeBuild = false;
   const run = new Run(world, { difficulty: save.difficulty as DifficultyId | undefined, omens: true, ...opts });

@@ -1,50 +1,49 @@
-// Gun turret branches. A plain gun turret can be upgraded in place (double-click it) into a Scatter gun, which sprays a cone at
-// short range, or a Sniper, which reaches far and hits very hard but slowly. Each is unlocked by the "Turret designs" research.
-import { canPay, pay, type Cost } from './costs';
+// Turret upgrades. Each family goes base -> two level-1 variants -> one level-2 weapon (see turretdata.ts). A building is upgraded in place by
+// double-clicking it. A level-2 weapon needs a level-1 variant first (either one will do); going back down is free. Each is unlocked by research.
+import { canPay, pay } from './costs';
 import { levelOf } from './research';
-import type { Turret, World } from './world';
+import { BASE_VARIANT, COIL_VARIANTS, VARIANTS, type CoilVariant, type PlateCost, type TurretVariant } from './turretdata';
+import type { Coil, Turret, World } from './world';
 
-export type TurretVariant = 'gun' | 'scatter' | 'sniper';
+export * from './turretdata';
 
-export interface VariantDef {
-  name: string;
-  blurb: string;
-  /** tiles, before research */
-  range: number;
-  /** seconds between shots, before research */
-  cooldown: number;
-  /** damage per ammunition shot, as a multiple of the ammunition's own damage */
-  dmgMul: number;
-  /** if set, one shot hits every enemy within this angle (radians, full width) of the aim, out to its range */
-  cone?: number;
-  cost: Cost;
-  /** the research level of 'Turret designs' that unlocks it */
-  unlock: number;
-  colour: string;
+export const variantOf = (t: Turret): TurretVariant => t.variant ?? BASE_VARIANT[t.kind];
+export const variantUnlocked = (w: World, v: TurretVariant): boolean => w.freeBuild || levelOf(w, VARIANTS[v].tech) >= VARIANTS[v].unlock;
+export const coilVariantOf = (c: Coil): CoilVariant => c.variant ?? 'coil';
+export const coilVariantUnlocked = (w: World, v: CoilVariant): boolean => w.freeBuild || levelOf(w, COIL_VARIANTS[v].tech) >= COIL_VARIANTS[v].unlock;
+
+/** 'wrong': a different family, or a level-2 weapon with no level-1 variant yet. */
+export type UpgradeResult = 'ok' | 'same' | 'locked' | 'short' | 'wrong';
+
+function change(w: World, curTier: number, newTier: number, cost: PlateCost, unlocked: boolean): UpgradeResult {
+  if (!unlocked) return 'locked';
+  if (newTier === 2 && curTier < 1) return 'wrong';
+  const goingDown = newTier < curTier;
+  if (!goingDown && !w.freeBuild && !canPay(w, cost)) return 'short';
+  if (!goingDown && !w.freeBuild) pay(w, cost);
+  return 'ok';
 }
 
-export const TURRET_BASE_COOLDOWN = 0.42;
-export const TURRET_BASE_RANGE = 7;
-
-export const VARIANTS: Record<TurretVariant, VariantDef> = {
-  gun: { name: 'Gun turret', blurb: 'Fast, steady fire at medium range. The all-rounder.', range: TURRET_BASE_RANGE, cooldown: TURRET_BASE_COOLDOWN, dmgMul: 1, cost: {}, unlock: 0, colour: '#ffa03a' },
-  scatter: { name: 'Scatter gun', blurb: 'Sprays a wide cone at short range, hitting every enemy in it. Superb against swarms, weak at a distance.', range: 4.6, cooldown: 0.95, dmgMul: 1.1, cone: 0.95, cost: { 'iron-plate': 40, 'copper-plate': 15 }, unlock: 1, colour: '#ff6a3a' },
-  sniper: { name: 'Sniper', blurb: 'Reaches far and hits one enemy very hard, but slowly. Armour barely matters to it.', range: 12.5, cooldown: 2.1, dmgMul: 5, cost: { 'iron-plate': 40, 'copper-plate': 25 }, unlock: 2, colour: '#6cc8ff' },
-};
-
-export const variantOf = (t: Turret): TurretVariant => t.variant ?? 'gun';
-export const variantUnlocked = (w: World, v: TurretVariant): boolean => w.freeBuild || levelOf(w, 'turret-designs') >= VARIANTS[v].unlock;
-
-export type UpgradeResult = 'ok' | 'same' | 'locked' | 'short';
-
-/** Changes a turret into another kind, paying the new kind's price (going back to the plain gun is free). Its ammunition stays. */
+/** Changes a turret into another of its family, paying the new kind's price (going down a tier is free). */
 export function setVariant(w: World, t: Turret, v: TurretVariant): UpgradeResult {
-  if (variantOf(t) === v) return 'same';
-  if (!variantUnlocked(w, v)) return 'locked';
-  const cost = VARIANTS[v].cost;
-  if (!w.freeBuild && !canPay(w, cost)) return 'short';
-  if (!w.freeBuild) pay(w, cost);
+  const cur = variantOf(t);
+  if (cur === v) return 'same';
+  if (VARIANTS[v].family !== VARIANTS[cur].family) return 'wrong';
+  const r = change(w, VARIANTS[cur].tier, VARIANTS[v].tier, VARIANTS[v].cost, variantUnlocked(w, v));
+  if (r !== 'ok') return r;
   t.variant = v;
+  if (v === 'artillery' || cur === 'artillery') t.ammo = 0; // shells and plates are different ammunition
   t.cooldown = 0.3;
+  return 'ok';
+}
+
+/** The same for a Storm coil (Shield, Stun, Railgun). Its stored charge stays. */
+export function setCoilVariant(w: World, c: Coil, v: CoilVariant): UpgradeResult {
+  const cur = coilVariantOf(c);
+  if (cur === v) return 'same';
+  const r = change(w, COIL_VARIANTS[cur].tier, COIL_VARIANTS[v].tier, COIL_VARIANTS[v].cost, coilVariantUnlocked(w, v));
+  if (r !== 'ok') return r;
+  c.variant = v;
+  c.cooldown = 0.5;
   return 'ok';
 }

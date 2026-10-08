@@ -3,9 +3,11 @@
 import { COIL_COOLDOWN, COIL_DAMAGE, COIL_JUMPS, COIL_RANGE, TURRET_COOLDOWN, TURRET_RANGE, fabRoomUsed } from './sim/combat';
 import { COSTS } from './sim/costs';
 import { ENEMIES } from './sim/enemies';
+import { BASE_VARIANT, COIL_VARIANTS, VARIANTS } from './sim/turretdata';
+import { DAMAGE_NAMES } from './sim/enemies';
 import { AMMO, FUEL, ITEMS, ORE_NAMES, RECIPES, SMELTS, type ItemId } from './sim/items';
 import { COIL_CHARGE_MAX, COIL_CHARGE_RATE, COIL_SHOT_COST, COIL_USE_CHARGING, COIL_USE_FULL, GEN_OUTPUT, POLE_REACH, POLE_SUPPLY, satisfaction } from './sim/power';
-import { FAB_CAPACITY, ROBOTS, ROBOT_SPACE } from './sim/robots';
+import { FAB_CAPACITY, FAB_ROBOTS, ROBOTS, ROBOT_SPACE, fabOf, plateText } from './sim/robots';
 import { problemOf } from './sim/status';
 import { KINDS, STRUCTURE_HP, TURRET_MAX_AMMO, type Enemy, type Entity, type World } from './sim/world';
 import type { Soldier } from './sim/robots';
@@ -73,23 +75,32 @@ function neededAndNow(e: Entity, w: World): { needs: string[]; now: string[] } {
       now.push(`Finished items waiting: ${e.out}.`);
       break;
     }
-    case 'turret': {
-      needs.push(`Ammo from a belt touching it, or an inserter: ${(Object.keys(AMMO) as ItemId[]).map((k) => `${nm(k)} (${AMMO[k]!.shots} shots of ${AMMO[k]!.damage} damage)`).join(' or ')}.`,
-        `Enemies within ${(TURRET_RANGE * w.rfx.turretRange).toFixed(1)} tiles (the circle on the map).`);
-      now.push(`${e.ammo} of ${e.maxAmmo ?? TURRET_MAX_AMMO} shots loaded.`, `Fires every ${(TURRET_COOLDOWN * w.rfx.turretCooldown).toFixed(2)}s for ${Math.round(e.dmg * w.mods.turretDmg * w.rfx.turretDmg)} damage (research and your commander included).`);
+    case 'turret': case 'flamer': {
+      const v = VARIANTS[e.variant ?? BASE_VARIANT[e.kind]];
+      needs.push(`Ammo from a belt touching it, or an inserter: ${v.ammo.map((k) => `${nm(k)} (${AMMO[k]!.shots} shots of ${AMMO[k]!.damage} damage)`).join(' or ')}.`,
+        `Enemies ${v.minRange ? `${v.minRange} to ` : 'within '}${(v.range * w.rfx.turretRange).toFixed(1)} tiles (the circle on the map).`);
+      now.push(`${v.name}: ${e.ammo} of ${e.maxAmmo ?? TURRET_MAX_AMMO} shots loaded.`, `Fires every ${(v.cooldown * w.rfx.turretCooldown).toFixed(2)}s for ${Math.round(e.dmg * v.dmgMul * w.mods.turretDmg * w.rfx.turretDmg)} ${DAMAGE_NAMES[v.type].toLowerCase()} damage${v.burn ? ' and sets enemies alight' : ''}${v.blast ? ', bursting over an area' : v.cone ? ' to everything in a cone' : ''} (research and your commander included).`);
+      if (v.tier < 2) now.push('Double-click it (with no building selected) to upgrade it.');
       break;
     }
-    case 'robotfab': {
+    case 'robotfab': case 'hangar': case 'foundry': case 'heavyworks': {
       const d = ROBOTS[e.type];
-      needs.push(`Iron plates from a belt touching it or an inserter: ${d.cost} per robot.`, 'A fight in progress (it builds only during fights).', 'Double-click it with no building selected to change what it builds.');
+      needs.push(`Plates from a belt touching it or an inserter: ${plateText(d.cost)} per ${d.name}.`, 'A fight in progress (it builds only during fights).', 'Double-click it with no building selected to change what it builds.');
       const used = fabRoomUsed(w, e.id);
-      needs.push(`Room: it can field ${FAB_CAPACITY} space of robots at once. A scout takes 1, a Titan takes ${ROBOT_SPACE.titan}. When its robots die, room frees up.`);
-      now.push(`Army room: <b>${used} of ${FAB_CAPACITY}</b> used. This robot takes ${ROBOT_SPACE[e.type]}${used + ROBOT_SPACE[e.type] > FAB_CAPACITY ? ' (too big to fit right now)' : ''}.`, `Building a <b>${d.name}</b> (${d.buildTime}s, ${d.hp} health, ${d.dps} damage/s).`, `${e.stock} plates loaded.`);
+      needs.push(`Room: it can field ${FAB_CAPACITY} space of robots at once (${FAB_ROBOTS[e.kind].map((t) => `${ROBOTS[t].name} ${ROBOT_SPACE[t]}`).join(', ')}). When its robots die, room frees up.`);
+      const have = Object.entries(d.cost).map(([k, n]) => `${nm(k as ItemId)} ${Math.min(n as number, e.inv[k as ItemId] ?? 0)}/${n}`).join(', ');
+      now.push(`Army room: <b>${used} of ${FAB_CAPACITY}</b> used. This robot takes ${ROBOT_SPACE[e.type]}${used + ROBOT_SPACE[e.type] > FAB_CAPACITY ? ' (too big to fit right now)' : ''}.`, `Building a <b>${d.name}</b> (${d.buildTime}s, ${d.hp} health, ${d.dps} damage/s).`, `Plates loaded: ${have}.`);
       break;
     }
     case 'scrapbin': {
       needs.push('An inserter (or the end of a belt) pointing into it. Give the inserter a filter to remove just one kind of item.');
       now.push(`Destroyed so far: <b>${e.burned}</b> items.`);
+      break;
+    }
+    case 'tunnel': {
+      const link = e.role === 'in' ? w.tunnelLink(e) : undefined;
+      needs.push(e.role === 'in' ? 'A belt (or inserter) feeding it from behind or the side, and an exit piece in line in front of it within 5 tiles, facing the same way.' : 'An entrance in line behind it, facing the same way. It hands items to whatever is in front of it.');
+      now.push(e.role === 'in' ? (link ? `Joined to its exit ${link.k} tiles ahead.` : '<b>No exit in range.</b>') : 'This is the exit.', `${e.items.filter((i) => i.pos >= 0).length} item(s) here.`);
       break;
     }
     case 'generator': {
@@ -99,8 +110,9 @@ function neededAndNow(e: Entity, w: World): { needs: string[]; now: string[] } {
     }
     case 'coil': {
       const sat = satisfaction(w, e);
+      now.push(`This is a ${COIL_VARIANTS[e.variant ?? 'coil'].name}: ${COIL_VARIANTS[e.variant ?? 'coil'].blurb}`);
       needs.push(`Power: it charges up to ${COIL_CHARGE_MAX} (gaining ${COIL_CHARGE_RATE} a second, for ${COIL_USE_CHARGING} power), each bolt spends ${COIL_SHOT_COST}, and a full coil draws only ${COIL_USE_FULL}.`, `A power pole within ${POLE_SUPPLY} tiles, on a network with a generator.`, `Enemies within ${(COIL_RANGE * w.rfx.coilRange).toFixed(1)} tiles (the circle on the map).`);
-      now.push(`Charge: <b>${Math.round(e.charge ?? 0)} of ${COIL_CHARGE_MAX}</b> (${Math.floor((e.charge ?? 0) / COIL_SHOT_COST)} bolts ready). Power supply ${Math.round(sat * 100)}% of what it wants.`, `Hits ${Math.round(COIL_DAMAGE * w.mods.coilDmg * w.rfx.coilDmg)} damage and jumps to ${COIL_JUMPS + w.mods.coilJumps + w.rfx.coilJumps} more enemies, every ${COIL_COOLDOWN}s.`);
+      now.push(`Charge: <b>${Math.round(e.charge ?? 0)} of ${COIL_CHARGE_MAX}</b> (${Math.floor((e.charge ?? 0) / (COIL_VARIANTS[e.variant ?? 'coil'].charge || COIL_SHOT_COST))} uses ready). Power supply ${Math.round(sat * 100)}% of what it wants.`, `Hits ${Math.round(COIL_DAMAGE * w.mods.coilDmg * w.rfx.coilDmg)} damage and jumps to ${COIL_JUMPS + w.mods.coilJumps + w.rfx.coilJumps} more enemies, every ${COIL_COOLDOWN}s.`);
       break;
     }
     case 'pole': {
@@ -143,7 +155,7 @@ export function inspectHtml(target: Target, w: World): string {
     return card(d.name, 'your robot', `<p>Health ${Math.round(target.s.hp)} of ${Math.round(target.s.maxHp)}.</p>` + sec('What it does', li([
       `Shoots enemies within ${(d.range * w.rfx.robotRange).toFixed(1)} tiles for ${d.dps} damage a second, and goes after enemies that come near.`,
       'Stands guard outside the base between fights. Robots do not heal, so a wounded one stays wounded.',
-      'Built in a Robot fabricator from iron plates.',
+      `Built in a ${KINDS[fabOf(target.s.type)].name} from ${plateText(d.cost)}.`,
     ])));
   }
   const e = target.e;

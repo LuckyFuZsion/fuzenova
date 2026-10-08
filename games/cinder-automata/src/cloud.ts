@@ -1,6 +1,7 @@
 // Accounts and cloud saves. Sign-in is email + password (Firebase Authentication); each player's run and progress live in one
 // Firestore document, cinderSaves/<uid>, that only that player can read or write (see firestore.rules).
 // Firebase's code is downloaded from Google's CDN only when the game opens, so it adds nothing to the game's own size.
+import { mergePrestige, type PrestigeState } from './sim/prestige';
 import { FIREBASE_CONFIG } from './firebase-config';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -21,6 +22,7 @@ const PROFILE_KEYS = {
   commander: 'cinder-automata.commander.v1',
   difficulty: 'cinder-automata.difficulty.v1',
   seen: 'cinder-automata.seen.v1',
+  prestige: 'cinder-automata.prestige.v1',
 } as const;
 type ProfileName = keyof typeof PROFILE_KEYS;
 
@@ -98,6 +100,35 @@ const DISPOSABLE = ['mailinator.com', '10minutemail.com', '10minutemail.net', 'g
   'mailnesia.com', 'mintemail.com', 'mohmal.com', 'emailondeck.com', 'burnermail.io', 'spamgourmet.com', 'tempinbox.com', 'moakt.com', 'tmpmail.org', 'tmpmail.net', 'discard.email', 'mailcatch.com',
   'spambox.us', 'incognitomail.com', 'mytemp.email', 'tempr.email', 'inboxkitten.com', 'emailfake.com', 'fakemail.net', 'luxusmail.org'];
 
+// ---------------------------------------------------------------- account emails
+// Verification and password-reset emails are sent by the FuzeNova site from its own domain. If that service is
+// unavailable, the player still gets Firebase's built-in email, so nobody is locked out.
+
+const mailApi = (): string => (/(^|\.)fuzenova\.dev$/.test(location.hostname) ? '' : 'https://www.fuzenova.dev');
+
+/** Returns true if our service sent it, false if it was unavailable (so the caller can use the built-in email). */
+async function viaSite(path: string, body: object, idToken?: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${mailApi()}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
+      body: JSON.stringify({ ...body, game: 'cinder-automata' }),
+    });
+    if (r.status === 429) throw Object.assign(new Error('Please wait a minute before asking for another email.'), { code: 'app/rate-limited' });
+    return r.ok;
+  } catch (e) {
+    if ((e as { code?: string })?.code === 'app/rate-limited') throw e;
+    return false; // network trouble or the service is down: fall back
+  }
+}
+
+async function emailVerificationLink(): Promise<void> {
+  const u = auth.currentUser;
+  if (!u) throw new Error('Not signed in.');
+  if (await viaSite('/api/auth/send-verification', {}, await u.getIdToken())) return;
+  await u.sendEmailVerification();
+}
+
 export function checkEmail(raw: string): { email: string } | { error: string } {
   const email = raw.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 120) return { error: 'That email address does not look right.' };
@@ -136,7 +167,7 @@ export async function createAccount(email: string, password: string, username: s
   const cred = await auth.createUserWithEmailAndPassword(email.trim(), password);
   await cred.user.updateProfile({ displayName: chk.name });
   try { await cred.user.reload(); } catch { /* the name is set; the reload only refreshes it */ }
-  try { await cred.user.sendEmailVerification(); } catch { /* the verify screen offers to send it again */ }
+  try { await emailVerificationLink(); } catch { /* the verify screen offers to send it again */ }
   user = toUser(auth.currentUser ?? cred.user); rememberUser(user);
   return user;
 }
@@ -144,8 +175,7 @@ export async function createAccount(email: string, password: string, username: s
 /** Sends the verification link again (or for the first time, for an older account). */
 export async function sendVerification(): Promise<void> {
   await loadSdk();
-  if (!auth.currentUser) throw new Error('Not signed in.');
-  await auth.currentUser.sendEmailVerification();
+  await emailVerificationLink();
 }
 
 /** Asks the account service whether the link has been clicked yet, and refreshes the sign-in token so the save rules see it. */
@@ -160,6 +190,7 @@ export async function refreshVerified(): Promise<CloudUser | null> {
 
 export async function resetPassword(email: string): Promise<void> {
   await loadSdk();
+  if (await viaSite('/api/auth/send-reset', { email: email.trim() })) return;
   await auth.sendPasswordResetEmail(email.trim());
 }
 
@@ -193,7 +224,9 @@ export function mergeProfile(a: Partial<Record<ProfileName, string>>, b: Partial
   const progress: Record<string, { best: number }> = { ...parse<Record<string, { best: number }>>(a.progress, {}) };
   for (const [id, v] of Object.entries(parse<Record<string, { best: number }>>(b.progress, {}))) progress[id] = { best: Math.max(progress[id]?.best ?? 0, v.best) };
   const seen = [...new Set([...parse<string[]>(a.seen, []), ...parse<string[]>(b.seen, [])])];
-  return { unlocks: JSON.stringify(unlocks), progress: JSON.stringify(progress), commander: a.commander ?? b.commander, difficulty: a.difficulty ?? b.difficulty, ...(a.seen !== undefined || b.seen !== undefined ? { seen: JSON.stringify(seen) } : {}) };
+  const base = { earned: 0, levels: {} };
+  const prestige = a.prestige !== undefined || b.prestige !== undefined ? { prestige: JSON.stringify(mergePrestige({ ...base, ...parse<Partial<PrestigeState>>(a.prestige, {}) }, { ...base, ...parse<Partial<PrestigeState>>(b.prestige, {}) })) } : {}; // the most Embers earned, the higher level of each perk, every talent either copy unlocked
+  return { ...prestige, unlocks: JSON.stringify(unlocks), progress: JSON.stringify(progress), commander: a.commander ?? b.commander, difficulty: a.difficulty ?? b.difficulty, ...(a.seen !== undefined || b.seen !== undefined ? { seen: JSON.stringify(seen) } : {}) };
 }
 
 function localProfile(): Partial<Record<ProfileName, string>> {

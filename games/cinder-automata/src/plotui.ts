@@ -41,7 +41,7 @@ export const ORE_INTRO: Record<number, string> = {
   3: 'Coal: fuel for generators and half of gunpowder. Storm coils run on the power it makes.',
   4: 'Tin ore: smelt it into tin plates for better gear.',
   5: 'Lead ore: smelt it into lead plates, which stronger ammunition and research need.',
-  6: 'Sulfur: mix it with coal to make gunpowder, which makes proper bullets.',
+  6: 'Sulfur: mix it with coal to make gunpowder, which goes into artillery shells.',
   7: 'Forest: wood, a weaker fuel you can burn in generators when coal is scarce.',
 };
 
