@@ -1,6 +1,6 @@
 export const site = {
   name: 'FuzeNova Games',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fuzenova.dev',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.fuzenova.dev',
   line: 'Elemental worlds, forged in your browser.',
   subline: 'Free games you can play right now: no download, no install, saves that follow you.',
   email: 'fuzenova@webfuzsion.co.uk',

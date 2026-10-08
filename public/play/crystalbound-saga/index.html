@@ -1610,6 +1610,34 @@ async function checkUsername(raw) {
   if (m.hasMatch(name) || m.hasMatch(name.replace(/[^A-Za-z0-9]/g, ''))) return { error: 'That username isn\u2019t allowed. Keep it friendly.' };
   return { name };
 }
+// Verification and password-reset emails are sent by the FuzeNova site from its own domain. If that service is
+// unavailable, the player still gets Firebase's built-in email, so nobody is locked out.
+const mailApi = () => (/(^|\.)fuzenova\.dev$/.test(location.hostname) ? '' : 'https://www.fuzenova.dev');
+async function viaSite(path, body, idToken) {
+  try {
+    const r = await fetch(mailApi() + path, {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, idToken ? { Authorization: 'Bearer ' + idToken } : {}),
+      body: JSON.stringify(Object.assign({}, body, { game: 'crystalbound-saga' })),
+    });
+    if (r.status === 429) throw Object.assign(new Error('Please wait a minute before asking for another email.'), { code: 'app/rate-limited' });
+    return r.ok;
+  } catch (e) {
+    if (e && e.code === 'app/rate-limited') throw e;
+    return false; // network trouble or the service is down: fall back
+  }
+}
+async function cloudSendVerification() {
+  const u = firebaseAuth && firebaseAuth.currentUser;
+  if (!u) throw new Error('Not signed in.');
+  if (await viaSite('/api/auth/send-verification', {}, await u.getIdToken())) return;
+  await u.sendEmailVerification();
+}
+async function cloudResetPassword(email) {
+  try { await ensureFirebaseAuth(); } catch (e) { throw Object.assign(new Error('Could not reach the account service. Check your connection.'), { code: 'auth/network-request-failed' }); }
+  if (await viaSite('/api/auth/send-reset', { email: email.trim() })) return;
+  await firebaseAuth.sendPasswordResetEmail(email.trim());
+}
 async function cloudCreateAccount(email, password, displayName) {
   const chk = await checkUsername(displayName);
   if (chk.error) throw Object.assign(new Error(chk.error), { code: 'auth/invalid-display-name' });
@@ -1625,6 +1653,7 @@ async function cloudCreateAccount(email, password, displayName) {
     try { await cred.user.reload(); } catch (_) {}
     cloudUser = firebaseAuth.currentUser;
     updatePlayerChip();
+    try { await cloudSendVerification(); } catch (_) { /* the account menu offers to send it again */ }
   }
 }
 async function cloudSignIn(email, password) {
@@ -4478,8 +4507,21 @@ function openCloudMenu(view) {
     openCard(`<h2>Cloud account</h2>
       <p class="cloudStatus ${stCls}" data-cloud-chip data-state="${cloudState}"><b>Signed in</b></p>
       <p>Playing as <b>${who}</b>.${mail}${last}</p>
+      ${cloudUser.emailVerified ? '' : `<p class="authErr" style="color:#ffd27a">Your email is not confirmed yet. Check your inbox (and spam) for our message.</p>
+      <div class="row"><button class="btn sec" id="cloudResend">Send it again</button><button class="btn sec" id="cloudRecheck">I’ve confirmed it</button></div>`}
       <div class="row"><button class="btn sec" id="cloudRename">Change username</button></div>
       <div class="row"><button class="btn sec" id="cloudSignOutBtn">Sign out</button><button class="btn" id="cloudClose">Close</button></div>`);
+    if ($('cloudResend')) $('cloudResend').onclick = async () => {
+      const b = $('cloudResend'); b.disabled = true;
+      try { await cloudSendVerification(); toast('Email sent — check your inbox', 2200); }
+      catch (e) { toast(friendlyAuthError(e), 2400); }
+      b.disabled = false;
+    };
+    if ($('cloudRecheck')) $('cloudRecheck').onclick = async () => {
+      try { await cloudUser.reload(); cloudUser = firebaseAuth.currentUser; updatePlayerChip(); } catch (_) {}
+      if (cloudUser && cloudUser.emailVerified) toast('Email confirmed — thank you!', 2000); else toast('Not confirmed yet', 1600);
+      openCloudMenu();
+    };
     // Renaming only updates the Firebase account profile: no database reads or writes. Same rules as sign-up.
     $('cloudRename').onclick = () => {
       openCard(`<h2>Change username</h2><p>This is the name shown on your profile and the map.</p>
@@ -4520,6 +4562,27 @@ function openCloudMenu(view) {
     return;
   }
 
+  if (view === 'reset') {
+    openCard(`<h2>Reset password</h2>
+      <p>Enter your account email and we’ll send you a link to choose a new password.</p>
+      <input class="authField" id="cloudEmail" type="email" autocomplete="email" placeholder="Email" />
+      <p class="authErr" id="cloudAuthErr"></p>
+      <div class="row"><button class="btn" id="cloudResetBtn">Send reset link</button></div>
+      <div class="row"><button class="btn sec" id="cloudBack">Back</button><button class="btn sec" id="cloudClose">Close</button></div>`);
+    $('cloudBack').onclick = () => openCloudMenu('signin');
+    $('cloudClose').onclick = closeCard;
+    $('cloudResetBtn').onclick = async () => {
+      const err = $('cloudAuthErr'); err.textContent = '';
+      const email = ($('cloudEmail').value || '').trim();
+      if (!email) { err.textContent = 'Enter your email.'; return; }
+      const b = $('cloudResetBtn'); b.disabled = true;
+      try {
+        await cloudResetPassword(email);
+        err.style.color = '#9be7a8'; err.textContent = 'If that email has an account, a reset link is on its way. Check your spam folder too.';
+      } catch (e) { err.style.color = ''; err.textContent = friendlyAuthError(e); b.disabled = false; }
+    };
+    return;
+  }
   const mode = view === 'create' || view === 'signin' ? view : 'home';
   if (mode === 'home') {
     openCard(`<h2>Cloud account</h2>
@@ -4548,12 +4611,14 @@ function openCloudMenu(view) {
       <input class="authField" id="cloudPass" type="password" autocomplete="current-password" placeholder="Password" />
       <p class="authErr" id="cloudAuthErr"></p>
       <div class="row"><button class="btn" id="cloudSignInBtn">Sign in</button></div>
+      <div class="row"><button class="btn sec" id="cloudForgot">Forgot password?</button></div>
       <div class="row"><button class="btn sec" id="cloudBack">Back</button><button class="btn sec" id="cloudClose">Close</button></div>`);
   }
 
   const errEl = $('cloudAuthErr');
   const setAuthErr = msg => { if (errEl) errEl.textContent = msg || ''; };
   if ($('cloudBack')) $('cloudBack').onclick = () => openCloudMenu('home');
+  if ($('cloudForgot')) $('cloudForgot').onclick = () => openCloudMenu('reset');
   if ($('cloudClose')) $('cloudClose').onclick = closeCard;
   if ($('cloudCreateBtn')) $('cloudCreateBtn').onclick = async () => {
     setAuthErr('');
@@ -4564,7 +4629,7 @@ function openCloudMenu(view) {
     if (!email || !pass) { setAuthErr('Enter email and password.'); return; }
     try {
       await cloudCreateAccount(email, pass, name);
-      toast('Account created — cloud save on', 1600);
+      toast('Account created — check your email to confirm it', 2600);
       openCloudMenu();
     } catch (e) { setAuthErr(friendlyAuthError(e)); }
   };
