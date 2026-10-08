@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { nav } from '@/lib/site'
 import { cn } from '@/lib/utils'
 import { Wordmark } from './emblem'
@@ -12,8 +13,11 @@ import { PlayPicker } from './play-picker'
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const reduce = useReducedMotion()
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     setOpen(false)
@@ -64,6 +68,8 @@ export function SiteHeader() {
         </button>
       </div>
 
+      {mounted &&
+        createPortal(
       <AnimatePresence>
         {open && (
           <motion.nav
@@ -73,7 +79,7 @@ export function SiteHeader() {
             animate={{ opacity: 1 }}
             exit={reduce ? undefined : { opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-18 bottom-0 z-40 flex flex-col items-center justify-center gap-7 bg-void lg:hidden"
+            className="fixed inset-x-0 top-18 bottom-0 z-30 flex flex-col items-center justify-center gap-7 bg-void lg:hidden"
           >
             {nav.map((item) => (
               <Link
@@ -88,7 +94,9 @@ export function SiteHeader() {
             <PlayPicker className="mt-4" />
           </motion.nav>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+          document.body,
+        )}
     </header>
   )
 }
