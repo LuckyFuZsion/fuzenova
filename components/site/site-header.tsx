@@ -1,13 +1,14 @@
 'use client'
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { nav } from '@/lib/site'
 import { cn } from '@/lib/utils'
 import { Wordmark } from './emblem'
+import { PlayPicker } from './play-picker'
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
@@ -50,9 +51,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <a href="/go/crystalbound-saga" className="btn btn-gold hidden lg:inline-flex">
-          Play now <ArrowRight className="size-4" aria-hidden="true" />
-        </a>
+        <PlayPicker className="hidden lg:inline-flex" />
         <button
           type="button"
           className="ml-auto inline-flex size-11 items-center justify-center rounded-full text-foreground lg:hidden"
@@ -86,9 +85,7 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <a href="/go/crystalbound-saga" className="btn btn-gold mt-4">
-              Play now <ArrowRight className="size-4" aria-hidden="true" />
-            </a>
+            <PlayPicker className="mt-4" />
           </motion.nav>
         )}
       </AnimatePresence>
