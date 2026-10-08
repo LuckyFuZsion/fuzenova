@@ -56,7 +56,7 @@ async function send(to: string, subject: string, content: Content) {
 export const contactTo = () => process.env.CONTACT_TO?.trim() || 'fuzenova@webfuzsion.co.uk'
 
 /** A message from the contact form, sent to us. Replying to it goes straight to the person who wrote in. */
-export function sendContactEmail(m: { name: string; email: string; topic: string; message: string }) {
+export function sendContactEmail(m: { name: string; email: string; topic: string; message: string; flagged?: boolean }) {
   const oneLine = (v: string) => v.replace(/[\r\n]+/g, ' ').trim()
   const html = `<!doctype html><html lang="en"><body style="font-family:Segoe UI,Arial,sans-serif;color:#111;line-height:1.5;">
 <p style="margin:0 0 4px;"><b>${esc(oneLine(m.name))}</b> &lt;${esc(oneLine(m.email))}&gt;</p>
@@ -70,7 +70,8 @@ Topic: ${m.topic} (via the FuzeNova contact form)
 ${m.message}
 
 Reply to this email to answer them directly.`
-  return postToResend({ to: contactTo(), subject: `[FuzeNova] ${m.topic}: ${oneLine(m.name).slice(0, 60)}`, html, text, replyTo: oneLine(m.email) })
+  const tag = m.flagged ? '[FuzeNova - possible spam]' : '[FuzeNova]'
+  return postToResend({ to: contactTo(), subject: `${tag} ${m.topic}: ${oneLine(m.name).slice(0, 60)}`, html, text, replyTo: oneLine(m.email) })
 }
 
 export function sendVerificationEmail(to: string, name: string, url: string, game: string | null) {

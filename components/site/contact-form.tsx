@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Send } from 'lucide-react'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -26,13 +26,18 @@ export function ContactForm() {
     formState: { errors, isSubmitting },
   } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { topic: 'General' } })
   const honeypot = useRef<HTMLInputElement>(null)
+  const shownAt = useRef(0)
+  useEffect(() => {
+    shownAt.current = Date.now()
+  }, [])
 
   const onSubmit = async (values: Values) => {
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, website: honeypot.current?.value ?? '' }),
+        // `t` is how long the form has been on screen; bots submit in a blink, people do not.
+        body: JSON.stringify({ ...values, hp: honeypot.current?.value ?? '', t: Date.now() - shownAt.current }),
       })
       if (res.status === 429) {
         toast.error('You have sent a few messages already. Please try again a little later.')
@@ -68,10 +73,21 @@ export function ContactForm() {
       <Field label="Message" id="message" error={errors.message?.message}>
         <textarea id="message" rows={6} className="field resize-y" aria-invalid={!!errors.message} aria-describedby={errors.message ? 'message-error' : undefined} {...register('message')} />
       </Field>
-      {/* Hidden from people; bots tend to fill every field. */}
+      {/* Bot trap: hidden from people, and named so browsers and password managers do not recognise it and autofill it
+          (a field called "website" or "url" would be filled with the visitor's own saved details). */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-        <label htmlFor="website">Leave this empty</label>
-        <input id="website" ref={honeypot} type="text" tabIndex={-1} autoComplete="off" />
+        <input
+          id="hp_x7q2"
+          name="hp_x7q2"
+          ref={honeypot}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-bwignore="true"
+          data-form-type="other"
+        />
       </div>
       <button type="submit" disabled={isSubmitting} className="btn btn-gold self-start disabled:opacity-60">
         {isSubmitting ? 'Sending...' : 'Send message'} <Send className="size-4" aria-hidden="true" />
