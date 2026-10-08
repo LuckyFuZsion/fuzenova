@@ -71,10 +71,8 @@ export function sendResetEmail(to: string, url: string, game: string | null) {
   })
 }
 
-/** Builds the link on our own site from the one-time code Firebase made, so players never see a firebaseapp.com address. */
-export function actionUrl(mode: 'verifyEmail' | 'resetPassword', firebaseLink: string, game: string | null) {
-  const code = new URL(firebaseLink).searchParams.get('oobCode')
-  if (!code) throw new Error('Firebase link had no code')
+/** Builds the link on our own site from the one-time code, so players never see a firebaseapp.com address. */
+export function actionUrl(mode: 'verifyEmail' | 'resetPassword', code: string, game: string | null) {
   const u = new URL('/auth/action', site.url)
   u.searchParams.set('mode', mode)
   u.searchParams.set('oobCode', code)

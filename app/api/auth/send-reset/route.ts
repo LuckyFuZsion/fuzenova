@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { adminAuth, mailConfigured } from '@/lib/server/firebase-admin'
+import { createActionCode, mailConfigured, userByEmail } from '@/lib/server/firebase-admin'
 import { corsHeaders } from '@/lib/server/cors'
 import { actionUrl, cleanGame, sendResetEmail } from '@/lib/server/mail'
 import { allow } from '@/lib/server/rate-limit'
@@ -31,11 +31,10 @@ export async function POST(req: Request) {
 
   const game = cleanGame(body.game)
   try {
-    const auth = adminAuth()
-    const user = await auth.getUserByEmail(email).catch(() => null)
+    const user = await userByEmail(email)
     if (user) {
-      const link = await auth.generatePasswordResetLink(email)
-      await sendResetEmail(email, actionUrl('resetPassword', link, game), game)
+      const code = await createActionCode('PASSWORD_RESET', email)
+      await sendResetEmail(email, actionUrl('resetPassword', code, game), game)
     }
   } catch (e) {
     // Logged for us, but the player gets the same answer as for an unknown address.

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { adminAuth, mailConfigured } from '@/lib/server/firebase-admin'
+import { BadTokenError, createActionCode, mailConfigured, userFromIdToken } from '@/lib/server/firebase-admin'
 import { corsHeaders } from '@/lib/server/cors'
 import { actionUrl, cleanGame, sendVerificationEmail } from '@/lib/server/mail'
 import { allow } from '@/lib/server/rate-limit'
@@ -21,9 +21,7 @@ export async function POST(req: Request) {
   if (!token) return reply({ error: 'unauthorised' }, 401)
 
   try {
-    const auth = adminAuth()
-    const decoded = await auth.verifyIdToken(token)
-    const user = await auth.getUser(decoded.uid)
+    const user = await userFromIdToken(token)
     if (!user.email) return reply({ error: 'no email on this account' }, 400)
     if (user.emailVerified) return reply({ ok: true, alreadyVerified: true })
 
@@ -33,12 +31,12 @@ export async function POST(req: Request) {
 
     const body = (await req.json().catch(() => ({}))) as { game?: unknown }
     const game = cleanGame(body.game)
-    const link = await auth.generateEmailVerificationLink(user.email)
-    await sendVerificationEmail(user.email, user.displayName ?? '', actionUrl('verifyEmail', link, game), game)
+    const code = await createActionCode('VERIFY_EMAIL', user.email)
+    await sendVerificationEmail(user.email, user.displayName, actionUrl('verifyEmail', code, game), game)
     return reply({ ok: true })
   } catch (e) {
     console.error('send-verification failed:', e instanceof Error ? e.message : e)
-    const badToken = (e as { code?: string })?.code?.startsWith('auth/')
+    const badToken = e instanceof BadTokenError
     return reply({ error: badToken ? 'unauthorised' : 'failed' }, badToken ? 401 : 500)
   }
 }
