@@ -34,17 +34,43 @@ ${paras}
   return { html, text }
 }
 
-async function send(to: string, subject: string, content: Content) {
+type Outgoing = { to: string; subject: string; html: string; text: string; replyTo?: string }
+
+async function postToResend({ to, subject, html, text, replyTo }: Outgoing) {
   const key = process.env.RESEND_API_KEY
   const from = process.env.MAIL_FROM
   if (!key || !from) throw new Error('RESEND_API_KEY or MAIL_FROM is not set')
-  const { html, text } = render(content)
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [to], subject, html, text }),
+    body: JSON.stringify({ from, to: [to], subject, html, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
   })
   if (!res.ok) throw new Error(`Resend returned ${res.status}: ${(await res.text()).slice(0, 200)}`)
+}
+
+async function send(to: string, subject: string, content: Content) {
+  const { html, text } = render(content)
+  await postToResend({ to, subject, html, text })
+}
+
+export const contactTo = () => process.env.CONTACT_TO?.trim() || 'fuzenova@webfuzsion.co.uk'
+
+/** A message from the contact form, sent to us. Replying to it goes straight to the person who wrote in. */
+export function sendContactEmail(m: { name: string; email: string; topic: string; message: string }) {
+  const oneLine = (v: string) => v.replace(/[\r\n]+/g, ' ').trim()
+  const html = `<!doctype html><html lang="en"><body style="font-family:Segoe UI,Arial,sans-serif;color:#111;line-height:1.5;">
+<p style="margin:0 0 4px;"><b>${esc(oneLine(m.name))}</b> &lt;${esc(oneLine(m.email))}&gt;</p>
+<p style="margin:0 0 16px;color:#555;">Topic: ${esc(m.topic)} &middot; via the FuzeNova contact form</p>
+<div style="white-space:pre-wrap;border-left:3px solid #e3b341;padding:4px 14px;">${esc(m.message)}</div>
+<p style="margin:16px 0 0;color:#777;font-size:13px;">Reply to this email to answer them directly.</p>
+</body></html>`
+  const text = `${oneLine(m.name)} <${oneLine(m.email)}>
+Topic: ${m.topic} (via the FuzeNova contact form)
+
+${m.message}
+
+Reply to this email to answer them directly.`
+  return postToResend({ to: contactTo(), subject: `[FuzeNova] ${m.topic}: ${oneLine(m.name).slice(0, 60)}`, html, text, replyTo: oneLine(m.email) })
 }
 
 export function sendVerificationEmail(to: string, name: string, url: string, game: string | null) {

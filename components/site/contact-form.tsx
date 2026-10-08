@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Send } from 'lucide-react'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -24,11 +25,25 @@ export function ContactForm() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { topic: 'General' } })
+  const honeypot = useRef<HTMLInputElement>(null)
 
-  const onSubmit = async () => {
-    await new Promise((r) => setTimeout(r, 400))
-    toast.success('Thanks! Your message is on its way.')
-    reset()
+  const onSubmit = async (values: Values) => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...values, website: honeypot.current?.value ?? '' }),
+      })
+      if (res.status === 429) {
+        toast.error('You have sent a few messages already. Please try again a little later.')
+        return
+      }
+      if (!res.ok) throw new Error(String(res.status))
+      toast.success('Thanks! Your message has been sent.')
+      reset()
+    } catch {
+      toast.error('Sorry, that did not send. Please try again, or email us directly.')
+    }
   }
 
   return (
@@ -53,6 +68,11 @@ export function ContactForm() {
       <Field label="Message" id="message" error={errors.message?.message}>
         <textarea id="message" rows={6} className="field resize-y" aria-invalid={!!errors.message} aria-describedby={errors.message ? 'message-error' : undefined} {...register('message')} />
       </Field>
+      {/* Hidden from people; bots tend to fill every field. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="website">Leave this empty</label>
+        <input id="website" ref={honeypot} type="text" tabIndex={-1} autoComplete="off" />
+      </div>
       <button type="submit" disabled={isSubmitting} className="btn btn-gold self-start disabled:opacity-60">
         {isSubmitting ? 'Sending...' : 'Send message'} <Send className="size-4" aria-hidden="true" />
       </button>
