@@ -3,7 +3,7 @@
   "name": "Cinder Automata",
   "short_name": "Cinder Automata",
   "description": "Build an automated factory, arm it, and hold the line. A FuzeNova Games production.",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

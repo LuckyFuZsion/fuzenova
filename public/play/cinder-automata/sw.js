@@ -1,5 +1,5 @@
 /* Cinder Automata service worker. Generated into the build by tools/build-pwa.mjs: edit the template, not the copy. */
-const VERSION = '2c5bb62e0b';
+const VERSION = '6f4ac98bd0';
 const CACHE = `cinder-automata-${VERSION}`;
 const SHELL = ["./","assets/index-BlbjTdG-.js","assets/index-xqLYkiui.css","fuzenova-intro/assets/core-glow.webp","fuzenova-intro/assets/emblem.webp","fuzenova-intro/assets/petal-ember.webp","fuzenova-intro/assets/petal-loam.webp","fuzenova-intro/assets/petal-storm.webp","fuzenova-intro/assets/petal-tide.webp","fuzenova-intro/assets/sting.mp3","fuzenova-intro/assets/word-fuzenova.webp","fuzenova-intro/assets/word-games.webp","fuzenova-intro/fuzenova-intro.js","icons/apple-touch-icon.png","icons/favicon.png","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","index.html","manifest.webmanifest","sprites/manifest.json","offline-files.json"];
 // The sign-in code (Firebase) comes from Google's servers. It is versioned, so a copy can be kept for good: after one successful visit the game
